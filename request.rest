@@ -1,0 +1,35 @@
+###
+
+GET http://localhost:3001
+
+###
+
+GET http://localhost:3001/localhost:3001/posts/677fa48797b7303de0359037
+
+###
+
+GET http://localhost:3001/posts
+
+###
+
+GET http://localhost:3001/posts?owner=userName
+
+###
+
+POST http://localhost:3001/posts
+Content-Type: application/json
+
+{
+    "owner": "userName",
+    "title": "postTitle",
+    "content": "postContent"
+}
+
+###
+
+DELETE http://localhost:3001/localhost:3001/localhost:3001/posts/postId
+
+###
+
+PUT http://localhost:3001/localhost:3001/posts/postId
+

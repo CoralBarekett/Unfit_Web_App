@@ -1,0 +1,12 @@
+[
+    {
+        "title": "Test Post 1",
+        "content": "Test Post 1 content",
+        "owner": "Coral"
+    },
+    {
+        "title": "Test Post 2",
+        "content": "Test Post 2 content",
+        "owner": "Yam"
+    }
+]
