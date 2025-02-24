@@ -1,6 +1,7 @@
 import express from "express";
-import authController from "../controllers/authController";
+import authController, { authMiddleware } from "../controllers/authController";
 import passport from "passport";
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
@@ -106,6 +107,20 @@ router.post("/logout", authController.logout);
 
 /**
  * @swagger
+ * /auth/user:
+ *   get:
+ *     summary: Get current user info
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: User information
+ *       401:
+ *         description: Not authenticated
+ */
+router.get("/user", authMiddleware, authController.user);
+
+/**
+ * @swagger
  * /auth/google:
  *   get:
  *     summary: Authenticate with Google
@@ -132,7 +147,7 @@ router.get(
     "/google/callback",
     passport.authenticate("google", { 
         session: false,
-        failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Google authentication failed` 
+        failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=Google%20authentication%20failed` 
     }),
     authController.googleCallback
 );
@@ -148,7 +163,7 @@ router.get(
  *         description: Redirects to Facebook authentication
  */
 router.get("/facebook", passport.authenticate("facebook", { 
-    scope: ["email"] 
+    scope: ["email", "public_profile"]  // Added public_profile scope
 }));
 
 /**
@@ -165,9 +180,39 @@ router.get(
     "/facebook/callback",
     passport.authenticate("facebook", { 
         session: false,
-        failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Facebook authentication failed` 
+        failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=Facebook%20authentication%20failed` 
     }),
     authController.facebookCallback
 );
+
+// Add a debug endpoint for testing OAuth flow (only in development)
+if (process.env.NODE_ENV !== 'production') {
+    router.get('/debug-token', (req, res) => {
+        try {
+            if (!process.env.TOKEN_SECRET) {
+                res.status(500).json({ message: 'Server error - No token secret' });
+                return;
+            }
+            
+            // Create a test user ID
+            const testUserId = 'debug123456789';
+            
+            // Create a test token for debugging
+            const accessToken = jwt.sign(
+                { _id: testUserId },
+                process.env.TOKEN_SECRET,
+                { expiresIn: '15m' }
+            );
+            
+            // Redirect to frontend callback
+            const redirectUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/oauth-success?accessToken=${encodeURIComponent(accessToken)}`;
+            console.log(`Debug redirecting to: ${redirectUrl}`);
+            res.redirect(redirectUrl);
+        } catch (error) {
+            console.error('Debug token error:', error);
+            res.status(500).json({ message: 'Server error generating debug token' });
+        }
+    });
+}
 
 export default router;

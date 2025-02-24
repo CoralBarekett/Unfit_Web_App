@@ -47,7 +47,7 @@ const Register: React.FC = () => {
   
   return (
     <div className="register-container">
-      <h2>Register</h2>
+      <h2 className="form-title">Create Your Unf:t Account</h2>
       {error && <div className="error-message">{error}</div>}
       
       <form onSubmit={handleSubmit}>
@@ -101,7 +101,7 @@ const Register: React.FC = () => {
           />
         </div>
         
-        <button type="submit" className="btn-primary">Register</button>
+        <button type="submit" className="btn btn-primary" style={{width: '100%'}}>Create Account</button>
       </form>
       
       <div className="login-link">

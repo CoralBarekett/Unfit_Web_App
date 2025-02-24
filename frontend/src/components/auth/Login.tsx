@@ -1,24 +1,32 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import GoogleLoginButton from './GoogleLoginButton';
+import FacebookLoginButton from './FacebookLoginButton';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const { login, error, loginWithGoogle, loginWithFacebook } = useContext(AuthContext);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { login, error } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await login(email, password);
-    if (success) {
-      navigate('/dashboard');
+    
+    try {
+      const success = await login(email, password);
+      if (success) {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
     }
   };
 
   return (
     <div className="login-container">
-      <h2>Login</h2>
+      <h2 className="form-title">Login to Unf:t</h2>
+      
       {error && <div className="error-message">{error}</div>}
       
       <form onSubmit={handleSubmit}>
@@ -44,20 +52,22 @@ const Login: React.FC = () => {
           />
         </div>
         
-        <button type="submit" className="btn-primary">Login</button>
+        <button type="submit" className="btn btn-primary" style={{width: '100%'}}>
+          Log In
+        </button>
       </form>
       
       <div className="social-login">
-        <button onClick={loginWithGoogle} className="btn-google">
-          Login with Google
-        </button>
-        <button onClick={loginWithFacebook} className="btn-facebook">
-          Login with Facebook
-        </button>
+        <div className="social-divider">
+          <span>OR</span>
+        </div>
+        
+        <GoogleLoginButton />
+        <FacebookLoginButton />
       </div>
       
       <div className="register-link">
-        Don't have an account? <Link to="/register">Register</Link>
+        Don't have an account? <Link to="/register">Register here</Link>
       </div>
     </div>
   );

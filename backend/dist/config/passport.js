@@ -20,9 +20,12 @@ const userModel_1 = __importDefault(require("../models/userModel"));
 passport_1.default.use(new passport_google_oauth20_1.Strategy({
     clientID: process.env.GOOGLE_CLIENT_ID || '',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    callbackURL: `${process.env.API_URL || 'http://localhost:5000'}/auth/google/callback`
+    callbackURL: `${process.env.API_URL || 'http://localhost:3001'}/auth/google/callback`,
+    // Use Google's People API for userinfo (more reliable)
+    userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
 }, (accessToken, refreshToken, profile, done) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log('Google profile:', JSON.stringify(profile));
         // Check if user already exists with this Google ID
         let user = yield userModel_1.default.findOne({ googleId: profile.id });
         if (user) {
@@ -54,6 +57,7 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
         return done(null, user);
     }
     catch (error) {
+        console.error('Google OAuth error:', error);
         return done(error);
     }
 })));
@@ -61,10 +65,14 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
 passport_1.default.use(new passport_facebook_1.Strategy({
     clientID: process.env.FACEBOOK_APP_ID || '',
     clientSecret: process.env.FACEBOOK_APP_SECRET || '',
-    callbackURL: `${process.env.API_URL || 'http://localhost:5000'}/auth/facebook/callback`,
-    profileFields: ['id', 'emails', 'name', 'displayName']
+    callbackURL: `${process.env.API_URL || 'http://localhost:3001'}/auth/facebook/callback`,
+    profileFields: ['id', 'emails', 'name', 'displayName'],
+    // Enable proof for improved security
+    enableProof: true
 }, (accessToken, refreshToken, profile, done) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // Log profile for debugging
+        console.log('Facebook profile:', JSON.stringify(profile));
         // Check if user already exists with this Facebook ID
         let user = yield userModel_1.default.findOne({ facebookId: profile.id });
         if (user) {
@@ -81,6 +89,9 @@ passport_1.default.use(new passport_facebook_1.Strategy({
                 return done(null, user);
             }
         }
+        else {
+            console.log('No email found in Facebook profile. This might be because your app does not have email permission.');
+        }
         // Create new user
         const email = profile.emails && profile.emails.length > 0
             ? profile.emails[0].value
@@ -96,8 +107,22 @@ passport_1.default.use(new passport_facebook_1.Strategy({
         return done(null, user);
     }
     catch (error) {
+        console.error('Facebook OAuth error:', error);
         return done(error);
     }
 })));
+// Passport session setup (even though we're using JWT)
+passport_1.default.serializeUser((user, done) => {
+    done(null, user._id);
+});
+passport_1.default.deserializeUser((id, done) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield userModel_1.default.findById(id);
+        done(null, user);
+    }
+    catch (error) {
+        done(error, null);
+    }
+}));
 exports.default = passport_1.default;
 //# sourceMappingURL=passport.js.map

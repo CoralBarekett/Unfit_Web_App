@@ -1,8 +1,8 @@
 {
-  "name": "rest_api_2nd_assignment",
+  "name": "unfit-web-backend",
   "version": "1.0.0",
-  "description": "That is a rest API project, the second assignent on Advanced Web Development Course",
-  "main": "app.js",
+  "description": " ",
+  "main": "app.ts",
   "scripts": {
     "dev": "nodemon ./src/app.ts",
     "start": "tsc && node dist/app.js",
