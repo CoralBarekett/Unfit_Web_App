@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import userModel from '../models/userModel';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export type AuthController = {
@@ -296,7 +295,6 @@ const googleCallback = async (req: Request, res: Response): Promise<void> => {
         res.cookie('refreshToken', refreshToken, cookieOptions);
 
         // Redirect to frontend with access token
-        // Make sure to properly encode the URL
         const redirectUrl = encodeURI(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/oauth-success?accessToken=${accessToken}`);
         res.redirect(redirectUrl);
     } catch (error) {
@@ -342,7 +340,6 @@ const facebookCallback = async (req: Request, res: Response): Promise<void> => {
         res.cookie('refreshToken', refreshToken, cookieOptions);
 
         // Redirect to frontend with access token
-        // Make sure to properly encode the URL
         const redirectUrl = encodeURI(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/oauth-success?accessToken=${accessToken}`);
         res.redirect(redirectUrl);
     } catch (error) {

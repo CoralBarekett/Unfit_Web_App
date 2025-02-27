@@ -9,6 +9,9 @@ export interface IUser {
   facebookId?: string;
   _id?: string;
   refreshToken?: string[];
+  bio?: string;
+  fullName?: string;
+  profileImage?: string;
   matchPassword?(enteredPassword: string): Promise<boolean>;
 }
 
@@ -43,6 +46,18 @@ const userSchema = new mongoose.Schema<IUser>({
   refreshToken: {
     type: [String],
     default: [],
+  },
+  bio: {
+    type: String,
+    default: '',
+  },
+  fullName: {
+    type: String,
+    default: '',
+  },
+  profileImage: {
+    type: String,
+    default: '',
   }
 });
 

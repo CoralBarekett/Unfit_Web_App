@@ -7,8 +7,21 @@ import FacebookLoginButton from './FacebookLoginButton';
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, error } = useContext(AuthContext);
+  const [loginFailed, setLoginFailed] = useState(false);
+  const { login, error, clearError } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    clearError(); // Clear any previous errors
+    setLoginFailed(false);
+    setEmail(e.target.value);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    clearError(); // Clear any previous errors
+    setLoginFailed(false);
+    setPassword(e.target.value);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,9 +30,12 @@ const Login: React.FC = () => {
       const success = await login(email, password);
       if (success) {
         navigate('/dashboard');
+      } else {
+        setLoginFailed(true);
       }
     } catch (err) {
       console.error('Login error:', err);
+      setLoginFailed(true);
     }
   };
 
@@ -27,7 +43,12 @@ const Login: React.FC = () => {
     <div className="login-container">
       <h2 className="form-title">Login to Unf:t</h2>
       
-      {error && <div className="error-message">{error}</div>}
+      {/* Display either context error or login failure message */}
+      {(error || loginFailed) && (
+        <div className="error-message">
+          {error || "Login failed. Please check your credentials."}
+        </div>
+      )}
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
@@ -36,7 +57,7 @@ const Login: React.FC = () => {
             type="email"
             id="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
             required
           />
         </div>
@@ -47,7 +68,7 @@ const Login: React.FC = () => {
             type="password"
             id="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange}
             required
           />
         </div>

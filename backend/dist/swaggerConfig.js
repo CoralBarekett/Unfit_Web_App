@@ -5,7 +5,7 @@ const swaggerDefinition = {
     info: {
         title: 'Unfit Web App',
         version: '1.0.0',
-        description: 'This is the REST API documentation for the Advanced Web Development course project.',
+        description: '',
         contact: {
             name: 'Yam Balas and Coral Bareket',
             email: 'coral.bareket@gmail.com',
@@ -13,7 +13,7 @@ const swaggerDefinition = {
     },
     servers: [
         {
-            url: 'http://localhost:3001',
+            url: 'http://localhost:5173',
             description: 'Local development server',
         },
     ],

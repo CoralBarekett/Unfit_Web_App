@@ -1,11 +1,16 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 
-// Define user interface
+// Define user interface with all profile fields
 interface User {
   _id: string;
   email: string;
   username?: string;
+  profileImage?: string;
+  bio?: string;
+  fullName?: string;
+  googleId?: string;
+  facebookId?: string;
 }
 
 // Define context interface
@@ -57,11 +62,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // API base URL - ensure this matches your backend server
-  const API_URL = 'http://localhost:3001';
+  // Use relative URL paths instead of hardcoded base URL
+  // This will work with Vite's proxy configuration
+  const API_BASE = '';
+  const AUTH_API = `${API_BASE}/auth`;
 
-  // Configure axios to include credentials (cookies)
-  axios.defaults.withCredentials = true;
+  // Configure axios defaults
+  axios.defaults.withCredentials = true; // Enable credentials for all requests
 
   const clearError = () => setError(null);
 
@@ -79,7 +86,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
       // Fetch user data
-      const response = await axios.get(`${API_URL}/auth/user`);
+      const response = await axios.get(`${AUTH_API}/user`);
       
       if (response.data && response.data._id) {
         setUser(response.data);
@@ -90,14 +97,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Try to refresh token
       try {
-        const refreshResponse = await axios.post(`${API_URL}/auth/refresh`);
+        const refreshResponse = await axios.post(`${AUTH_API}/refresh`);
         
         if (refreshResponse.data && refreshResponse.data.accessToken) {
           localStorage.setItem('accessToken', refreshResponse.data.accessToken);
           axios.defaults.headers.common['Authorization'] = `Bearer ${refreshResponse.data.accessToken}`;
           
           // Try fetching user again
-          const userResponse = await axios.get(`${API_URL}/auth/user`);
+          const userResponse = await axios.get(`${AUTH_API}/user`);
           
           if (userResponse.data && userResponse.data._id) {
             setUser(userResponse.data);
@@ -107,6 +114,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } catch (refreshErr) {
         // If refresh fails, clear token and authentication state
         localStorage.removeItem('accessToken');
+        delete axios.defaults.headers.common['Authorization'];
         setUser(null);
         setIsAuthenticated(false);
       }
@@ -118,6 +126,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Check if user is already logged in
     checkAuthStatus();
+    
+    // Setup event listener for OAuth success
+    const handleOAuthSuccess = (e: MessageEvent) => {
+      if (e.data && e.data.type === 'oauth-success' && e.data.accessToken) {
+        localStorage.setItem('accessToken', e.data.accessToken);
+        checkAuthStatus();
+      }
+    };
     
     // Listen for popstate events (back/forward navigation)
     const handlePopState = () => {
@@ -132,10 +148,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
 
+    window.addEventListener('message', handleOAuthSuccess);
     window.addEventListener('popstate', handlePopState);
     window.addEventListener('storage', handleStorageChange);
     
     return () => {
+      window.removeEventListener('message', handleOAuthSuccess);
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('storage', handleStorageChange);
     };
@@ -145,26 +163,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (userData: RegisterData): Promise<boolean> => {
     setError(null);
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, userData);
+      console.log('Attempting to register with:', userData);
+      
+      const response = await axios.post(`${AUTH_API}/register`, userData);
+      console.log('Registration response:', response.data);
       
       if (response.data && response.data.accessToken) {
         localStorage.setItem('accessToken', response.data.accessToken);
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
-        setUser(response.data.user || response.data);
+        setUser(response.data.user);
         setIsAuthenticated(true);
-        
-        // Update history state to prevent back button issues
-        window.history.replaceState(
-          { isAuthenticated: true },
-          document.title,
-          window.location.pathname
-        );
         
         return true;
       }
       return false;
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed');
+      console.error('Registration error:', err.response || err);
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
       return false;
     }
   };
@@ -173,26 +188,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<boolean> => {
     setError(null);
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+      console.log('Attempting login for:', email);
+      
+      const response = await axios.post(`${AUTH_API}/login`, { email, password });
+      console.log('Login response:', response.data);
       
       if (response.data && response.data.accessToken) {
         localStorage.setItem('accessToken', response.data.accessToken);
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
-        setUser(response.data.user || response.data);
+        setUser(response.data.user);
         setIsAuthenticated(true);
-        
-        // Update history state to prevent back button issues
-        window.history.replaceState(
-          { isAuthenticated: true },
-          document.title,
-          window.location.pathname
-        );
         
         return true;
       }
       return false;
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      console.error('Login error:', err.response || err);
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
       return false;
     }
   };
@@ -202,7 +214,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       // Only attempt to call logout endpoint if we're authenticated
       if (isAuthenticated) {
-        await axios.post(`${API_URL}/auth/logout`);
+        await axios.post(`${AUTH_API}/logout`);
       }
     } catch (err) {
       console.error('Logout error:', err);
@@ -211,13 +223,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       delete axios.defaults.headers.common['Authorization'];
       setUser(null);
       setIsAuthenticated(false);
-      
-      // Update history state to prevent back button issues
-      window.history.replaceState(
-        { isAuthenticated: false },
-        document.title,
-        '/login'
-      );
     }
   };
 
@@ -227,7 +232,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     sessionStorage.setItem('redirectPath', window.location.pathname);
     
     // Open Google OAuth in the same window
-    window.location.href = `${API_URL}/auth/google`;
+    window.location.href = `${AUTH_API}/google`;
   };
 
   const loginWithFacebook = (): void => {
@@ -235,7 +240,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     sessionStorage.setItem('redirectPath', window.location.pathname);
     
     // Open Facebook OAuth in the same window
-    window.location.href = `${API_URL}/auth/facebook`;
+    window.location.href = `${AUTH_API}/facebook`;
   };
 
   return (

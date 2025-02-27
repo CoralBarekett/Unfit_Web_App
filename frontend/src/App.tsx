@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import AutoThemeProvider from './components/theme/AutoThemeProvider';
 import HistoryManager from './components/common/HistoryManager';
 import RouteManager from './components/common/RouteManager';
@@ -60,41 +59,36 @@ const App: React.FC = () => {
 
   return (
     <AutoThemeProvider>
-      <AuthProvider>
-        <Router>
-          {/* History and route management components */}
-          <HistoryManager />
-          <RouteManager />
-          <ScrollToTop />
-          
-          <div className="app">
-            <Navbar />
-            <main className="main-content">
-              <div className="container">
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/oauth-success" element={<OAuthCallback />} />
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    }
-                  />
-                  {/* Add a catch-all route for any unmatched routes */}
-                  <Route
-                    path="*"
-                    element={<HomePage />}
-                  />
-                </Routes>
-              </div>
-            </main>
+      <HistoryManager />
+      <RouteManager />
+      <ScrollToTop />
+      
+      <div className="app">
+        <Navbar />
+        <main className="main-content">
+          <div className="container">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/oauth-success" element={<OAuthCallback />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              {/* Add a catch-all route for any unmatched routes */}
+              <Route
+                path="*"
+                element={<HomePage />}
+              />
+            </Routes>
           </div>
-        </Router>
-      </AuthProvider>
+        </main>
+      </div>
     </AutoThemeProvider>
   );
 };

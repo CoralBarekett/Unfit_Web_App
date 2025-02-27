@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
           <>
             <li className="nav-item">
               <Link to="/dashboard" className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}>
-                Dashboard
+                My Profile
               </Link>
             </li>
             <li className="nav-item">

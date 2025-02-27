@@ -38,9 +38,18 @@ const initApp = () => {
             app.use(bodyParser.json());
             app.use(bodyParser.urlencoded({ extended: true }));
             app.use(cookieParser()); // Add cookie parser
+            
+            // CORS configuration - FIX: Updated CORS settings to properly handle requests
             app.use(cors({
-                origin: process.env.FRONTEND_URL || 'http://localhost:5173/',
-                credentials: true // Important for cookies to work cross-origin
+                // Use an array to allow multiple origins
+                origin: [
+                    process.env.FRONTEND_URL || 'http://localhost:5173', 
+                    'http://localhost:5173',
+                    'http://127.0.0.1:5173'
+                ],
+                credentials: true, // Important for cookies to work cross-origin
+                methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+                allowedHeaders: ['Content-Type', 'Authorization']
             }));
             
             // Initialize Passport

@@ -17,12 +17,15 @@ const Register: React.FC = () => {
     confirmPassword: ''
   });
   
-  const { register, error } = useContext(AuthContext);
+  const [registrationFailed, setRegistrationFailed] = useState(false);
+  const { register, error, clearError } = useContext(AuthContext);
   const navigate = useNavigate();
   
   const { email, username, password, confirmPassword } = formData;
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    clearError(); // Clear any previous errors when user types
+    setRegistrationFailed(false);
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
   
@@ -34,21 +37,34 @@ const Register: React.FC = () => {
       return;
     }
     
-    const success = await register({
-      email,
-      username,
-      password
-    });
-    
-    if (success) {
-      navigate('/dashboard');
+    try {
+      const success = await register({
+        email,
+        username,
+        password
+      });
+      
+      if (success) {
+        navigate('/dashboard');
+      } else {
+        setRegistrationFailed(true);
+      }
+    } catch (err) {
+      console.error('Registration error:', err);
+      setRegistrationFailed(true);
     }
   };
   
   return (
     <div className="register-container">
       <h2 className="form-title">Create Your Unf:t Account</h2>
-      {error && <div className="error-message">{error}</div>}
+      
+      {/* Display either context error or registration failure message */}
+      {(error || registrationFailed) && (
+        <div className="error-message">
+          {error || "Registration failed. Please try again."}
+        </div>
+      )}
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
@@ -101,7 +117,9 @@ const Register: React.FC = () => {
           />
         </div>
         
-        <button type="submit" className="btn btn-primary" style={{width: '100%'}}>Create Account</button>
+        <button type="submit" className="btn btn-primary" style={{width: '100%'}}>
+          Create Account
+        </button>
       </form>
       
       <div className="login-link">
