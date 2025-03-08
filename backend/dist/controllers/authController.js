@@ -15,11 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authMiddleware = void 0;
 const userModel_1 = __importDefault(require("../models/userModel"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-// Cookie options for storing refresh tokens
+// Cookie options with explicit typing
 const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -28,7 +28,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Check if user already exists
         const userExists = yield userModel_1.default.findOne({ email });
         if (userExists) {
-            res.status(400).send('User with this email already exists');
+            res.status(400).json({ message: 'User with this email already exists' });
             return;
         }
         // Create new user
@@ -40,7 +40,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
         // Generate access token
         if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server error');
+            res.status(500).json({ message: 'Server error' });
             return;
         }
         const accessToken = jsonwebtoken_1.default.sign({ _id: user._id }, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_EXPIRATION || '15m' });
@@ -52,35 +52,38 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Set refresh token as httpOnly cookie
         res.cookie('refreshToken', refreshToken, cookieOptions);
         res.status(201).json({
-            _id: user._id,
-            email: user.email,
-            username: user.username,
+            user: {
+                _id: user._id,
+                email: user.email,
+                username: user.username
+            },
             accessToken
         });
     }
     catch (error) {
-        res.status(400).send(error);
+        console.error('Registration error:', error);
+        res.status(400).json({ message: 'Registration failed', error });
     }
 });
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield userModel_1.default.findOne({ email: req.body.email });
         if (!user) {
-            res.status(400).send('Wrong username or password');
+            res.status(400).json({ message: 'Wrong username or password' });
             return;
         }
         // Verify password
         if (!user.matchPassword) {
-            res.status(500).send('Server error');
+            res.status(500).json({ message: 'Server error' });
             return;
         }
         const validPassword = yield user.matchPassword(req.body.password);
         if (!validPassword) {
-            res.status(400).send('Wrong username or password');
+            res.status(400).json({ message: 'Wrong username or password' });
             return;
         }
         if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server error');
+            res.status(500).json({ message: 'Server error' });
             return;
         }
         // Generate access token
@@ -94,14 +97,17 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Set refresh token as httpOnly cookie
         res.cookie('refreshToken', refreshToken, cookieOptions);
         res.status(200).json({
-            email: user.email,
-            _id: user._id,
-            username: user.username,
+            user: {
+                _id: user._id,
+                email: user.email,
+                username: user.username
+            },
             accessToken
         });
     }
     catch (error) {
-        res.status(400).send(error);
+        console.error('Login error:', error);
+        res.status(400).json({ message: 'Login failed', error });
     }
 });
 const refresh = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -110,11 +116,11 @@ const refresh = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Get refresh token from cookie or request body
         const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
         if (!refreshToken) {
-            res.status(401).send('Refresh token required');
+            res.status(401).json({ message: 'Refresh token required' });
             return;
         }
         if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server error');
+            res.status(500).json({ message: 'Server error' });
             return;
         }
         // Verify refresh token
@@ -125,7 +131,7 @@ const refresh = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             refreshToken: refreshToken
         });
         if (!user) {
-            res.status(401).send('Invalid refresh token');
+            res.status(401).json({ message: 'Invalid refresh token' });
             return;
         }
         // Remove used refresh token
@@ -144,7 +150,8 @@ const refresh = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        res.status(401).send('Invalid refresh token');
+        console.error('Token refresh error:', error);
+        res.status(401).json({ message: 'Invalid refresh token' });
     }
 });
 const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -162,10 +169,33 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         // Clear refresh token cookie
         res.clearCookie('refreshToken', cookieOptions);
-        res.status(200).send('Logged out successfully');
+        res.status(200).json({ message: 'Logged out successfully' });
     }
     catch (error) {
-        res.status(500).send('Server error');
+        console.error('Logout error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+// Get user info endpoint
+const user = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Get user ID from middleware
+        const userId = req.body.userId;
+        if (!userId) {
+            res.status(401).json({ message: 'Not authenticated' });
+            return;
+        }
+        // Find user
+        const user = yield userModel_1.default.findById(userId).select('-password -refreshToken');
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+        res.status(200).json(user);
+    }
+    catch (error) {
+        console.error('User fetch error:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 // OAuth callback handlers
@@ -174,11 +204,11 @@ const googleCallback = (req, res) => __awaiter(void 0, void 0, void 0, function*
         // User should be attached by passport middleware
         const user = req.user;
         if (!user || !user._id) {
-            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication failed`);
+            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication%20failed`);
             return;
         }
         if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server error');
+            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Server%20error`);
             return;
         }
         // Generate tokens
@@ -191,10 +221,12 @@ const googleCallback = (req, res) => __awaiter(void 0, void 0, void 0, function*
         // Set refresh token cookie
         res.cookie('refreshToken', refreshToken, cookieOptions);
         // Redirect to frontend with access token
-        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/oauth-success?accessToken=${accessToken}`);
+        const redirectUrl = encodeURI(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/oauth-success?accessToken=${accessToken}`);
+        res.redirect(redirectUrl);
     }
     catch (error) {
-        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication failed`);
+        console.error('Google callback error:', error);
+        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication%20failed`);
     }
 });
 const facebookCallback = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -202,11 +234,11 @@ const facebookCallback = (req, res) => __awaiter(void 0, void 0, void 0, functio
         // User should be attached by passport middleware
         const user = req.user;
         if (!user || !user._id) {
-            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication failed`);
+            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication%20failed`);
             return;
         }
         if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server error');
+            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Server%20error`);
             return;
         }
         // Generate tokens
@@ -219,25 +251,34 @@ const facebookCallback = (req, res) => __awaiter(void 0, void 0, void 0, functio
         // Set refresh token cookie
         res.cookie('refreshToken', refreshToken, cookieOptions);
         // Redirect to frontend with access token
-        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/oauth-success?accessToken=${accessToken}`);
+        const redirectUrl = encodeURI(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/oauth-success?accessToken=${accessToken}`);
+        res.redirect(redirectUrl);
     }
     catch (error) {
-        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication failed`);
+        console.error('Facebook callback error:', error);
+        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication%20failed`);
     }
 });
-// Updated auth middleware to support checking tokens from cookies
+// Auth middleware - exported separately from the controller object
 const authMiddleware = (req, res, next) => {
     try {
         // Check Authorization header first
         const authorization = req.header('authorization');
-        let token = authorization && authorization.split('JWT ')[1];
+        let token = null;
+        if (authorization) {
+            // Support both "Bearer" and "JWT" prefixes
+            if (authorization.startsWith('Bearer ')) {
+                token = authorization.split('Bearer ')[1];
+            }
+            else if (authorization.startsWith('JWT ')) {
+                token = authorization.split('JWT ')[1];
+            }
+        }
         // If no token in header, check cookies
         if (!token && req.cookies.refreshToken) {
             // Attempt to get new access token using refresh token
-            // This is optional and depends on your token strategy
-            // In a real app, you might want to call the refresh endpoint instead
             if (!process.env.TOKEN_SECRET) {
-                res.status(500).send('Server error');
+                res.status(500).json({ message: 'Server error' });
                 return;
             }
             try {
@@ -251,16 +292,16 @@ const authMiddleware = (req, res, next) => {
             }
         }
         if (!token) {
-            res.status(401).send('Access Denied');
+            res.status(401).json({ message: 'Access Denied' });
             return;
         }
         if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server error');
+            res.status(500).json({ message: 'Server error' });
             return;
         }
         jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET, (error, payload) => {
             if (error) {
-                res.status(401).send('Access Denied');
+                res.status(401).json({ message: 'Access Denied - Invalid token' });
                 return;
             }
             req.body.userId = payload._id;
@@ -268,7 +309,8 @@ const authMiddleware = (req, res, next) => {
         });
     }
     catch (error) {
-        res.status(401).send('Access Denied');
+        console.error('Auth middleware error:', error);
+        res.status(401).json({ message: 'Access Denied' });
     }
 };
 exports.authMiddleware = authMiddleware;
@@ -278,7 +320,8 @@ const controller = {
     refresh,
     logout,
     googleCallback,
-    facebookCallback
+    facebookCallback,
+    user
 };
 exports.default = controller;
 //# sourceMappingURL=authController.js.map

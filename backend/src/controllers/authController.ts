@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import userModel from '../models/userModel';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export type AuthController = {
@@ -10,13 +9,19 @@ export type AuthController = {
     logout: (req: Request, res: Response) => Promise<void>;
     googleCallback: (req: Request, res: Response) => Promise<void>;
     facebookCallback: (req: Request, res: Response) => Promise<void>;
+    user: (req: Request, res: Response) => Promise<void>;
 };
 
-// Cookie options for storing refresh tokens
-const cookieOptions = {
+// Cookie options with explicit typing
+const cookieOptions: {
+    httpOnly: boolean;
+    secure: boolean;
+    sameSite: 'strict' | 'lax' | 'none' | undefined;
+    maxAge: number;
+} = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict' as const,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
@@ -27,7 +32,7 @@ const register = async (req: Request, res: Response): Promise<void> => {
         // Check if user already exists
         const userExists = await userModel.findOne({ email });
         if (userExists) {
-            res.status(400).send('User with this email already exists');
+            res.status(400).json({ message: 'User with this email already exists' });
             return;
         }
         
@@ -41,7 +46,7 @@ const register = async (req: Request, res: Response): Promise<void> => {
 
         // Generate access token
         if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server error');
+            res.status(500).json({ message: 'Server error' });
             return;
         }
 
@@ -66,13 +71,16 @@ const register = async (req: Request, res: Response): Promise<void> => {
         res.cookie('refreshToken', refreshToken, cookieOptions);
 
         res.status(201).json({
-            _id: user._id,
-            email: user.email,
-            username: user.username,
+            user: {
+                _id: user._id,
+                email: user.email,
+                username: user.username
+            },
             accessToken
         });
     } catch (error) {
-        res.status(400).send(error);
+        console.error('Registration error:', error);
+        res.status(400).json({ message: 'Registration failed', error });
     }
 };
 
@@ -80,24 +88,24 @@ const login = async (req: Request, res: Response): Promise<void> => {
     try {
         const user = await userModel.findOne({ email: req.body.email });
         if (!user) {
-            res.status(400).send('Wrong username or password');
+            res.status(400).json({ message: 'Wrong username or password' });
             return;
         }
 
         // Verify password
         if (!user.matchPassword) {
-            res.status(500).send('Server error');
+            res.status(500).json({ message: 'Server error' });
             return;
         }
         
         const validPassword = await user.matchPassword(req.body.password);
         if (!validPassword) {
-            res.status(400).send('Wrong username or password');
+            res.status(400).json({ message: 'Wrong username or password' });
             return;
         }
 
         if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server error');
+            res.status(500).json({ message: 'Server error' });
             return;
         }
 
@@ -124,13 +132,16 @@ const login = async (req: Request, res: Response): Promise<void> => {
         res.cookie('refreshToken', refreshToken, cookieOptions);
 
         res.status(200).json({
-            email: user.email,
-            _id: user._id,
-            username: user.username,
+            user: {
+                _id: user._id,
+                email: user.email,
+                username: user.username
+            },
             accessToken
         });
     } catch (error) {
-        res.status(400).send(error);
+        console.error('Login error:', error);
+        res.status(400).json({ message: 'Login failed', error });
     }
 };
 
@@ -140,12 +151,12 @@ const refresh = async (req: Request, res: Response): Promise<void> => {
         const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
         
         if (!refreshToken) {
-            res.status(401).send('Refresh token required');
+            res.status(401).json({ message: 'Refresh token required' });
             return;
         }
 
         if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server error');
+            res.status(500).json({ message: 'Server error' });
             return;
         }
 
@@ -159,7 +170,7 @@ const refresh = async (req: Request, res: Response): Promise<void> => {
         });
 
         if (!user) {
-            res.status(401).send('Invalid refresh token');
+            res.status(401).json({ message: 'Invalid refresh token' });
             return;
         }
 
@@ -191,7 +202,8 @@ const refresh = async (req: Request, res: Response): Promise<void> => {
             refreshToken: newRefreshToken
         });
     } catch (error) {
-        res.status(401).send('Invalid refresh token');
+        console.error('Token refresh error:', error);
+        res.status(401).json({ message: 'Invalid refresh token' });
     }
 };
 
@@ -212,9 +224,36 @@ const logout = async (req: Request, res: Response): Promise<void> => {
         // Clear refresh token cookie
         res.clearCookie('refreshToken', cookieOptions);
         
-        res.status(200).send('Logged out successfully');
+        res.status(200).json({ message: 'Logged out successfully' });
     } catch (error) {
-        res.status(500).send('Server error');
+        console.error('Logout error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+// Get user info endpoint
+const user = async (req: Request, res: Response): Promise<void> => {
+    try {
+        // Get user ID from middleware
+        const userId = req.body.userId;
+        
+        if (!userId) {
+            res.status(401).json({ message: 'Not authenticated' });
+            return;
+        }
+        
+        // Find user
+        const user = await userModel.findById(userId).select('-password -refreshToken');
+        
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+        
+        res.status(200).json(user);
+    } catch (error) {
+        console.error('User fetch error:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -225,12 +264,12 @@ const googleCallback = async (req: Request, res: Response): Promise<void> => {
         const user = req.user as any;
         
         if (!user || !user._id) {
-            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication failed`);
+            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication%20failed`);
             return;
         }
 
         if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server error');
+            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Server%20error`);
             return;
         }
 
@@ -256,9 +295,11 @@ const googleCallback = async (req: Request, res: Response): Promise<void> => {
         res.cookie('refreshToken', refreshToken, cookieOptions);
 
         // Redirect to frontend with access token
-        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/oauth-success?accessToken=${accessToken}`);
+        const redirectUrl = encodeURI(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/oauth-success?accessToken=${accessToken}`);
+        res.redirect(redirectUrl);
     } catch (error) {
-        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication failed`);
+        console.error('Google callback error:', error);
+        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication%20failed`);
     }
 };
 
@@ -268,12 +309,12 @@ const facebookCallback = async (req: Request, res: Response): Promise<void> => {
         const user = req.user as any;
         
         if (!user || !user._id) {
-            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication failed`);
+            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication%20failed`);
             return;
         }
 
         if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server error');
+            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Server%20error`);
             return;
         }
 
@@ -299,26 +340,35 @@ const facebookCallback = async (req: Request, res: Response): Promise<void> => {
         res.cookie('refreshToken', refreshToken, cookieOptions);
 
         // Redirect to frontend with access token
-        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/oauth-success?accessToken=${accessToken}`);
+        const redirectUrl = encodeURI(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/oauth-success?accessToken=${accessToken}`);
+        res.redirect(redirectUrl);
     } catch (error) {
-        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication failed`);
+        console.error('Facebook callback error:', error);
+        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication%20failed`);
     }
 };
 
-// Updated auth middleware to support checking tokens from cookies
+// Auth middleware - exported separately from the controller object
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     try {
         // Check Authorization header first
         const authorization = req.header('authorization');
-        let token = authorization && authorization.split('JWT ')[1];
+        let token = null;
+        
+        if (authorization) {
+            // Support both "Bearer" and "JWT" prefixes
+            if (authorization.startsWith('Bearer ')) {
+                token = authorization.split('Bearer ')[1];
+            } else if (authorization.startsWith('JWT ')) {
+                token = authorization.split('JWT ')[1];
+            }
+        }
 
         // If no token in header, check cookies
         if (!token && req.cookies.refreshToken) {
             // Attempt to get new access token using refresh token
-            // This is optional and depends on your token strategy
-            // In a real app, you might want to call the refresh endpoint instead
             if (!process.env.TOKEN_SECRET) {
-                res.status(500).send('Server error');
+                res.status(500).json({ message: 'Server error' });
                 return;
             }
             
@@ -333,25 +383,26 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
         }
 
         if (!token) {
-            res.status(401).send('Access Denied');
+            res.status(401).json({ message: 'Access Denied' });
             return;
         }
 
         if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server error');
+            res.status(500).json({ message: 'Server error' });
             return;
         }
 
         jwt.verify(token, process.env.TOKEN_SECRET, (error, payload) => {
             if (error) {
-                res.status(401).send('Access Denied');
+                res.status(401).json({ message: 'Access Denied - Invalid token' });
                 return;
             }
             req.body.userId = (payload as { _id: string })._id;
             next();
         });
     } catch (error) {
-        res.status(401).send('Access Denied');
+        console.error('Auth middleware error:', error);
+        res.status(401).json({ message: 'Access Denied' });
     }
 };
 
@@ -361,7 +412,8 @@ const controller: AuthController = {
     refresh,
     logout,
     googleCallback,
-    facebookCallback
+    facebookCallback,
+    user
 };
 
 export default controller;

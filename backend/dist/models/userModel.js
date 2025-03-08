@@ -45,6 +45,18 @@ const userSchema = new mongoose_1.default.Schema({
     refreshToken: {
         type: [String],
         default: [],
+    },
+    bio: {
+        type: String,
+        default: '',
+    },
+    fullName: {
+        type: String,
+        default: '',
+    },
+    profileImage: {
+        type: String,
+        default: '',
     }
 });
 // Password hashing middleware

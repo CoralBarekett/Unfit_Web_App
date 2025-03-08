@@ -1,11 +1,16 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 
-// Define user interface
+// Define user interface with all profile fields
 interface User {
   _id: string;
   email: string;
   username?: string;
+  profileImage?: string;
+  bio?: string;
+  fullName?: string;
+  googleId?: string;
+  facebookId?: string;
 }
 
 // Define context interface
@@ -19,6 +24,9 @@ interface AuthContextType {
   logout: () => Promise<void>;
   loginWithGoogle: () => void;
   loginWithFacebook: () => void;
+  setUser: (user: User) => void;
+  setIsAuthenticated: (isAuth: boolean) => void;
+  clearError: () => void;
 }
 
 // Define register data interface
@@ -38,7 +46,10 @@ export const AuthContext = createContext<AuthContextType>({
   login: async () => false,
   logout: async () => {},
   loginWithGoogle: () => {},
-  loginWithFacebook: () => {}
+  loginWithFacebook: () => {},
+  setUser: () => {},
+  setIsAuthenticated: () => {},
+  clearError: () => {}
 });
 
 interface AuthProviderProps {
@@ -51,81 +62,124 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // API base URL
-  const API_URL = 'http://localhost:3001';
+  // Use relative URL paths instead of hardcoded base URL
+  // This will work with Vite's proxy configuration
+  const API_BASE = '';
+  const AUTH_API = `${API_BASE}/auth`;
 
-  // Configure axios to include credentials (cookies)
-  axios.defaults.withCredentials = true;
+  // Configure axios defaults
+  axios.defaults.withCredentials = true; // Enable credentials for all requests
+
+  const clearError = () => setError(null);
+
+  // Function to check authentication status
+  const checkAuthStatus = async (): Promise<void> => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      
+      // Set auth header
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
+      // Fetch user data
+      const response = await axios.get(`${AUTH_API}/user`);
+      
+      if (response.data && response.data._id) {
+        setUser(response.data);
+        setIsAuthenticated(true);
+      }
+    } catch (err) {
+      console.error('Authentication error:', err);
+      
+      // Try to refresh token
+      try {
+        const refreshResponse = await axios.post(`${AUTH_API}/refresh`);
+        
+        if (refreshResponse.data && refreshResponse.data.accessToken) {
+          localStorage.setItem('accessToken', refreshResponse.data.accessToken);
+          axios.defaults.headers.common['Authorization'] = `Bearer ${refreshResponse.data.accessToken}`;
+          
+          // Try fetching user again
+          const userResponse = await axios.get(`${AUTH_API}/user`);
+          
+          if (userResponse.data && userResponse.data._id) {
+            setUser(userResponse.data);
+            setIsAuthenticated(true);
+          }
+        }
+      } catch (refreshErr) {
+        // If refresh fails, clear token and authentication state
+        localStorage.removeItem('accessToken');
+        delete axios.defaults.headers.common['Authorization'];
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Check if user is already logged in
-    const checkAuthStatus = async (): Promise<void> => {
-      try {
-        const token = localStorage.getItem('accessToken');
-        
-        if (!token) {
-          setLoading(false);
-          return;
-        }
-        
-        // Set auth header
-        axios.defaults.headers.common['Authorization'] = `JWT ${token}`;
-        
-        // Fetch user data
-        const response = await axios.get(`${API_URL}/auth/user`);
-        
-        if (response.data && response.data._id) {
-          setUser(response.data);
-          setIsAuthenticated(true);
-        }
-      } catch (err) {
-        console.error('Authentication error:', err);
-        
-        // Try to refresh token
-        try {
-          const refreshResponse = await axios.post(`${API_URL}/auth/refresh`);
-          
-          if (refreshResponse.data && refreshResponse.data.accessToken) {
-            localStorage.setItem('accessToken', refreshResponse.data.accessToken);
-            axios.defaults.headers.common['Authorization'] = `JWT ${refreshResponse.data.accessToken}`;
-            
-            // Try fetching user again
-            const userResponse = await axios.get(`${API_URL}/auth/user`);
-            
-            if (userResponse.data && userResponse.data._id) {
-              setUser(userResponse.data);
-              setIsAuthenticated(true);
-            }
-          }
-        } catch (refreshErr) {
-          localStorage.removeItem('accessToken');
-          setUser(null);
-          setIsAuthenticated(false);
-        }
-      } finally {
-        setLoading(false);
+    checkAuthStatus();
+    
+    // Setup event listener for OAuth success
+    const handleOAuthSuccess = (e: MessageEvent) => {
+      if (e.data && e.data.type === 'oauth-success' && e.data.accessToken) {
+        localStorage.setItem('accessToken', e.data.accessToken);
+        checkAuthStatus();
       }
     };
     
-    checkAuthStatus();
+    // Listen for popstate events (back/forward navigation)
+    const handlePopState = () => {
+      // Re-validate authentication when navigating through history
+      checkAuthStatus();
+    };
+
+    // Listen for storage events (in case token changes in another tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'accessToken') {
+        checkAuthStatus();
+      }
+    };
+
+    window.addEventListener('message', handleOAuthSuccess);
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('message', handleOAuthSuccess);
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   // Register new user
   const register = async (userData: RegisterData): Promise<boolean> => {
     setError(null);
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, userData);
+      console.log('Attempting to register with:', userData);
+      
+      const response = await axios.post(`${AUTH_API}/register`, userData);
+      console.log('Registration response:', response.data);
       
       if (response.data && response.data.accessToken) {
         localStorage.setItem('accessToken', response.data.accessToken);
-        axios.defaults.headers.common['Authorization'] = `JWT ${response.data.accessToken}`;
-        setUser(response.data);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
+        setUser(response.data.user);
         setIsAuthenticated(true);
+        
         return true;
       }
       return false;
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed');
+      console.error('Registration error:', err.response || err);
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
       return false;
     }
   };
@@ -134,18 +188,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<boolean> => {
     setError(null);
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+      console.log('Attempting login for:', email);
+      
+      const response = await axios.post(`${AUTH_API}/login`, { email, password });
+      console.log('Login response:', response.data);
       
       if (response.data && response.data.accessToken) {
         localStorage.setItem('accessToken', response.data.accessToken);
-        axios.defaults.headers.common['Authorization'] = `JWT ${response.data.accessToken}`;
-        setUser(response.data);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
+        setUser(response.data.user);
         setIsAuthenticated(true);
+        
         return true;
       }
       return false;
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      console.error('Login error:', err.response || err);
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
       return false;
     }
   };
@@ -153,24 +212,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Logout user
   const logout = async (): Promise<void> => {
     try {
-      await axios.post(`${API_URL}/auth/logout`);
+      // Only attempt to call logout endpoint if we're authenticated
+      if (isAuthenticated) {
+        await axios.post(`${AUTH_API}/logout`);
+      }
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
       localStorage.removeItem('accessToken');
+      delete axios.defaults.headers.common['Authorization'];
       setUser(null);
       setIsAuthenticated(false);
-      delete axios.defaults.headers.common['Authorization'];
     }
   };
 
   // Social login redirects
   const loginWithGoogle = (): void => {
-    window.location.href = `${API_URL}/auth/google`;
+    // Store current path to redirect back after authentication
+    sessionStorage.setItem('redirectPath', window.location.pathname);
+    
+    // Open Google OAuth in the same window
+    window.location.href = `${AUTH_API}/google`;
   };
 
   const loginWithFacebook = (): void => {
-    window.location.href = `${API_URL}/auth/facebook`;
+    // Store current path to redirect back after authentication
+    sessionStorage.setItem('redirectPath', window.location.pathname);
+    
+    // Open Facebook OAuth in the same window
+    window.location.href = `${AUTH_API}/facebook`;
   };
 
   return (
@@ -184,7 +254,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         login,
         logout,
         loginWithGoogle,
-        loginWithFacebook
+        loginWithFacebook,
+        setUser,
+        setIsAuthenticated,
+        clearError
       }}
     >
       {children}
