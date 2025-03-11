@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 
@@ -24,7 +25,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   loginWithGoogle: () => void;
   loginWithFacebook: () => void;
-  setUser: (user: User) => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   setIsAuthenticated: (isAuth: boolean) => void;
   clearError: () => void;
 }

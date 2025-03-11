@@ -1,18 +1,32 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/Dashboard.css';
+import axios from 'axios';
 
 const Dashboard = () => {
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const [showMenu, setShowMenu] = useState(false);
   const [activeTab, setActiveTab] = useState('grid');
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const [editedUser, setEditedUser] = useState({
     username: user?.username || 'username',
     bio: user?.bio || '',
     profileImage: user?.profileImage || ''
   });
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  
+  // Update local state when user data changes
+  useEffect(() => {
+    if (user) {
+      setEditedUser({
+        username: user.username || 'username',
+        bio: user.bio || '',
+        profileImage: user.profileImage || ''
+      });
+    }
+  }, [user]);
   
   // Sample data (need to be replaced with actual data from the backend)
   const stats = {
@@ -23,12 +37,48 @@ const Dashboard = () => {
     taggedItems: 0
   };
 
-  const handleEditToggle = () => {
+  const handleEditToggle = async () => {
     if (isEditing) {
-      // Save changes logic would go here
-      // For example: updateUserProfile(editedUser)
-      console.log('Saving user data:', editedUser);
+      // Save changes
+      try {
+        setIsLoading(true);
+        setError('');
+        
+        // Create form data if we have a new image to upload
+        const updatedProfile = { ...editedUser };
+        
+        // If using file uploads, you'd handle the image upload here
+        // and then add the resulting URL to updatedProfile.profileImage
+        
+        // For example:
+        // if (newImageFile) {
+        //   const formData = new FormData();
+        //   formData.append('profileImage', newImageFile);
+        //   const uploadResponse = await axios.post('/api/upload', formData);
+        //   updatedProfile.profileImage = uploadResponse.data.imageUrl;
+        // }
+        
+        // Update profile in database
+        const response = await axios.put(
+          `${import.meta.env.VITE_API_URL|| 'http://localhost:3001'}/auth/profile`, 
+          updatedProfile,
+          { withCredentials: true }
+        );
+        
+        // Update user in context if successful
+        if (response.data && setUser) {
+          setUser(response.data);
+        }
+        
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error updating profile:', err);
+        setError('Failed to update profile. Please try again.');
+        setIsLoading(false);
+      }
     }
+    
+    // Toggle editing mode
     setIsEditing(!isEditing);
   };
 
@@ -45,18 +95,15 @@ const Dashboard = () => {
       setPreviewImage(imageUrl);
       
       // In a real app, you'd upload the file to your server/cloud storage
-      // For now, we'll just update the local state
-      // setEditedUser(prev => ({ ...prev, profileImage: imageUrl }));
-      
-      // Note: In a real implementation, you would:
-      // 1. Upload the file to your backend/storage
-      // 2. Get back a permanent URL
-      // 3. Update the user with that URL
+      // For now, we'll just update the local state for the preview
     }
   };
 
   return (
     <div className="dashboard">
+      {/* Show error message if present */}
+      {error && <div className="error-message">{error}</div>}
+      
       {/* Header with username and hamburger menu */}
       <div className="profile-header-top">
         {isEditing ? (
@@ -156,8 +203,9 @@ const Dashboard = () => {
             <button 
               className={`btn-edit-profile ${isEditing ? 'btn-save-profile' : ''}`}
               onClick={handleEditToggle}
+              disabled={isLoading}
             >
-              {isEditing ? 'Save Profile' : 'Edit Profile'}
+              {isLoading ? 'Saving...' : isEditing ? 'Save Profile' : 'Edit Profile'}
             </button>
             <button className="btn-share-profile" disabled={isEditing}>Share Profile</button>
           </div>

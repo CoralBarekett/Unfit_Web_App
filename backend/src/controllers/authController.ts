@@ -12,6 +12,7 @@ export type AuthController = {
     googleCallback: (req: Request, res: Response) => Promise<void>;
     facebookCallback: (req: Request, res: Response) => Promise<void>;
     user: (req: Request, res: Response) => Promise<void>;
+    updateProfile: (req: Request, res: Response) => Promise<void>;
 };
 
 // Cookie options with explicit typing
@@ -144,6 +145,53 @@ const login = async (req: Request, res: Response): Promise<void> => {
     } catch (error) {
         console.error('Login error:', error);
         res.status(400).json({ message: 'Login failed', error });
+    }
+};
+
+const updateProfile = async (req: Request, res: Response): Promise<void> => {
+    try {
+        // Get user ID from middleware
+        const userId = req.body.userId;
+        
+        if (!userId) {
+            res.status(401).json({ message: 'Not authenticated' });
+            return;
+        }
+        
+        // Find user
+        const user = await userModel.findById(userId);
+        
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+        
+        // Fields that can be updated
+        const allowedUpdates = ['username', 'bio', 'fullName', 'profileImage'];
+        
+        // Update only allowed fields
+        for (const field of allowedUpdates) {
+            if (req.body[field] !== undefined) {
+                // @ts-expect-error - we've already checked that the field is valid
+                user[field] = req.body[field];
+            }
+        }
+        
+        // Save the updated user
+        await user.save();
+        
+        // Return user without sensitive info
+        res.status(200).json({
+            _id: user._id,
+            email: user.email,
+            username: user.username,
+            bio: user.bio,
+            fullName: user.fullName,
+            profileImage: user.profileImage
+        });
+    } catch (error) {
+        console.error('Profile update error:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -415,7 +463,8 @@ const controller: AuthController = {
     logout,
     googleCallback,
     facebookCallback,
-    user
+    user,
+    updateProfile
 };
 
 export default controller;
