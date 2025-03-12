@@ -28,6 +28,17 @@ const cookieOptions: {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
+// Options for clearing cookies (without maxAge)
+const clearCookieOptions: {
+    httpOnly: boolean;
+    secure: boolean;
+    sameSite: 'strict' | 'lax' | 'none' | undefined;
+} = {
+    httpOnly: cookieOptions.httpOnly,
+    secure: cookieOptions.secure,
+    sameSite: cookieOptions.sameSite
+};
+
 const register = async (req: Request, res: Response): Promise<void> => {
     try {
         const { email, username, password } = req.body;
@@ -271,8 +282,8 @@ const logout = async (req: Request, res: Response): Promise<void> => {
             }
         }
 
-        // Clear refresh token cookie
-        res.clearCookie('refreshToken', cookieOptions);
+        // Clear refresh token cookie using clearCookieOptions without maxAge
+        res.clearCookie('refreshToken', clearCookieOptions);
         
         res.status(200).json({ message: 'Logged out successfully' });
     } catch (error) {
