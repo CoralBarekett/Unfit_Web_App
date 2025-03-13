@@ -22,6 +22,12 @@ const cookieOptions = {
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
+// Options for clearing cookies (without maxAge)
+const clearCookieOptions = {
+    httpOnly: cookieOptions.httpOnly,
+    secure: cookieOptions.secure,
+    sameSite: cookieOptions.sameSite
+};
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, username, password } = req.body;
@@ -207,8 +213,8 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 yield user.save();
             }
         }
-        // Clear refresh token cookie
-        res.clearCookie('refreshToken', cookieOptions);
+        // Clear refresh token cookie using clearCookieOptions without maxAge
+        res.clearCookie('refreshToken', clearCookieOptions);
         res.status(200).json({ message: 'Logged out successfully' });
     }
     catch (error) {
