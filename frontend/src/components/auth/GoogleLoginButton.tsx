@@ -3,6 +3,7 @@ import { AuthContext } from '../../context/AuthContext';
 
 const GoogleLoginButton: React.FC = () => {
   const { loginWithGoogle, error } = useContext(AuthContext);
+  console.log(error);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGoogleLogin = () => {

@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable no-async-promise-executor */
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const body_parser_1 = __importDefault(require("body-parser"));
@@ -19,6 +20,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const passport_1 = __importDefault(require("passport"));
+const path_1 = __importDefault(require("path"));
 // Import routes
 const postsRoutes_1 = __importDefault(require("./routes/postsRoutes"));
 const commentsRoutes_1 = __importDefault(require("./routes/commentsRoutes"));
@@ -59,6 +61,8 @@ const initApp = () => {
             }));
             // Initialize Passport
             app.use(passport_1.default.initialize());
+            // Serve static files from the uploads directory
+            app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, '../uploads')));
             // Routes
             app.use('/posts', postsRoutes_1.default);
             app.use('/comments', commentsRoutes_1.default);

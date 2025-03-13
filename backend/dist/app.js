@@ -16,6 +16,8 @@ const server_1 = __importDefault(require("./server"));
 const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swaggerConfig_1 = __importDefault(require("./swaggerConfig"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const port = process.env.PORT || 5000;
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {

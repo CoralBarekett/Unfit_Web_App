@@ -2,7 +2,9 @@ import appInit from './server';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import swaggerConfig from './swaggerConfig';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const port = process.env.PORT || 5000;
 
 const startServer = async () => {

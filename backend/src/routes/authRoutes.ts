@@ -71,6 +71,39 @@ router.post("/login", authController.login);
 
 /**
  * @swagger
+ * /auth/profile:
+ *   put:
+ *     summary: Update user profile
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               bio:
+ *                 type: string
+ *               fullName:
+ *                 type: string
+ *               profileImage:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *       401:
+ *         description: Not authenticated
+ *       404:
+ *         description: User not found
+ */
+router.put("/profile", authMiddleware, authController.updateProfile);
+
+/**
+ * @swagger
  * /auth/refresh:
  *   post:
  *     summary: Refresh a user's access token

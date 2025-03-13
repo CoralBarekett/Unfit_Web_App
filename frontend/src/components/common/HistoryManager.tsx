@@ -58,6 +58,8 @@ const HistoryManager: React.FC = () => {
       // Detect which direction we're navigating
       try {
         const currentPath = sessionStorage.getItem('currentPath') || '/';
+        
+        
         const historyStackString = sessionStorage.getItem('appHistoryStack');
         const historyStack = historyStackString 
           ? JSON.parse(historyStackString) 
@@ -77,6 +79,7 @@ const HistoryManager: React.FC = () => {
           // Store the path they were trying to access
           sessionStorage.setItem('intendedPath', location.pathname);
           navigate('/login', { replace: true });
+          console.log(currentPath,historyStack,pathState,event);
           return;
         }
         

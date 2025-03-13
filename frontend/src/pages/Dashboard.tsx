@@ -1,11 +1,32 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/Dashboard.css';
+import axios from 'axios';
 
 const Dashboard = () => {
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const [showMenu, setShowMenu] = useState(false);
   const [activeTab, setActiveTab] = useState('grid');
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [editedUser, setEditedUser] = useState({
+    username: user?.username || 'username',
+    bio: user?.bio || '',
+    profileImage: user?.profileImage || ''
+  });
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  
+  // Update local state when user data changes
+  useEffect(() => {
+    if (user) {
+      setEditedUser({
+        username: user.username || 'username',
+        bio: user.bio || '',
+        profileImage: user.profileImage || ''
+      });
+    }
+  }, [user]);
   
   // Sample data (need to be replaced with actual data from the backend)
   const stats = {
@@ -16,11 +37,86 @@ const Dashboard = () => {
     taggedItems: 0
   };
 
+  const handleEditToggle = async () => {
+    if (isEditing) {
+      // Save changes
+      try {
+        setIsLoading(true);
+        setError('');
+        
+        // Create form data if we have a new image to upload
+        const updatedProfile = { ...editedUser };
+        
+        // If using file uploads, you'd handle the image upload here
+        // and then add the resulting URL to updatedProfile.profileImage
+        
+        // For example:
+        // if (newImageFile) {
+        //   const formData = new FormData();
+        //   formData.append('profileImage', newImageFile);
+        //   const uploadResponse = await axios.post('/api/upload', formData);
+        //   updatedProfile.profileImage = uploadResponse.data.imageUrl;
+        // }
+        
+        // Update profile in database
+        const response = await axios.put(
+          `${import.meta.env.VITE_API_URL|| 'http://localhost:3001'}/auth/profile`, 
+          updatedProfile,
+          { withCredentials: true }
+        );
+        
+        // Update user in context if successful
+        if (response.data && setUser) {
+          setUser(response.data);
+        }
+        
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error updating profile:', err);
+        setError('Failed to update profile. Please try again.');
+        setIsLoading(false);
+      }
+    }
+    
+    // Toggle editing mode
+    setIsEditing(!isEditing);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEditedUser(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Create a preview URL for the selected image
+      const imageUrl = URL.createObjectURL(file);
+      setPreviewImage(imageUrl);
+      
+      // In a real app, you'd upload the file to your server/cloud storage
+      // For now, we'll just update the local state for the preview
+    }
+  };
+
   return (
     <div className="dashboard">
+      {/* Show error message if present */}
+      {error && <div className="error-message">{error}</div>}
+      
       {/* Header with username and hamburger menu */}
       <div className="profile-header-top">
-        <h2 className="profile-header-username">{user?.username || 'username'}</h2>
+        {isEditing ? (
+          <input 
+            type="text" 
+            name="username"
+            value={editedUser.username}
+            onChange={handleInputChange}
+            className="profile-header-username-edit"
+          />
+        ) : (
+          <h2 className="profile-header-username">{editedUser.username}</h2>
+        )}
         
         {/* Hamburger menu */}
         <div className="relative">
@@ -51,10 +147,38 @@ const Dashboard = () => {
         {/* Profile picture */}
         <div className="profile-picture">
           <div className="profile-picture-circle">
-            {user?.profileImage ? (
-              <img src={user.profileImage} alt="Profile" />
+            {isEditing ? (
+              <div className="profile-picture-edit">
+                {previewImage || editedUser.profileImage ? (
+                  <img 
+                    src={previewImage || editedUser.profileImage} 
+                    alt="Profile" 
+                  />
+                ) : (
+                  <span>{editedUser.username.charAt(0).toUpperCase()}</span>
+                )}
+                <label htmlFor="profile-image-upload" className="profile-image-upload-label">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                  </svg>
+                </label>
+                <input 
+                  type="file" 
+                  id="profile-image-upload" 
+                  accept="image/*" 
+                  onChange={handleImageChange} 
+                  style={{ display: 'none' }}
+                />
+              </div>
             ) : (
-              <span>{user?.username?.charAt(0)?.toUpperCase() || 'U'}</span>
+              <>
+                {editedUser.profileImage || previewImage ? (
+                  <img src={previewImage || editedUser.profileImage} alt="Profile" />
+                ) : (
+                  <span>{editedUser.username.charAt(0).toUpperCase()}</span>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -76,13 +200,29 @@ const Dashboard = () => {
           </div>
           
           <div className="profile-actions">
-            <button className="btn-edit-profile">Edit Profile</button>
-            <button className="btn-share-profile">Share Profile</button>
+            <button 
+              className={`btn-edit-profile ${isEditing ? 'btn-save-profile' : ''}`}
+              onClick={handleEditToggle}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Saving...' : isEditing ? 'Save Profile' : 'Edit Profile'}
+            </button>
+            <button className="btn-share-profile" disabled={isEditing}>Share Profile</button>
           </div>
           
           {/* Bio section */}
           <div className="profile-bio">
-            <div className="description">{user?.bio || ' '}</div>
+            {isEditing ? (
+              <textarea
+                name="bio"
+                value={editedUser.bio}
+                onChange={handleInputChange}
+                className="bio-edit"
+                placeholder="Write your bio here..."
+              />
+            ) : (
+              <div className="description">{editedUser.bio || ' '}</div>
+            )}
           </div>
         </div>
       </div>

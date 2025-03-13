@@ -1,3 +1,4 @@
+/* eslint-disable no-async-promise-executor */
 import express, {Express} from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
@@ -5,6 +6,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
+import path from 'path';
 
 // Import routes
 import postsRoutes from './routes/postsRoutes';
@@ -54,6 +56,9 @@ const initApp = () => {
             
             // Initialize Passport
             app.use(passport.initialize());
+            
+            // Serve static files from the uploads directory
+            app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
             
             // Routes
             app.use('/posts', postsRoutes);
