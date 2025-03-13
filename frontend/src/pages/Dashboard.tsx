@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/Dashboard.css';
@@ -16,6 +17,7 @@ const Dashboard = () => {
     profileImage: user?.profileImage || ''
   });
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   
   // Update local state when user data changes
   useEffect(() => {
@@ -37,6 +39,44 @@ const Dashboard = () => {
     taggedItems: 0
   };
 
+  // Image upload function
+const uploadImg = async (file: File) => {
+  if (!file) return null;
+  
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    
+    // Extract file extension for the content type
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const contentType = fileExtension === 'png' 
+      ? 'image/png' 
+      : fileExtension === 'gif' 
+        ? 'image/gif' 
+        : 'image/jpeg';
+    
+    // Generate a unique filename using timestamp
+    const filename = `profile_${Date.now()}.${fileExtension}`;
+    
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/file?file=${filename}`, 
+      formData, 
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data' // Let the browser set the boundary
+        },
+        withCredentials: true
+      }
+    );
+    
+    console.log("Upload response:", response);
+    return response.data.url;
+  } catch (err) {
+    console.error("Error uploading image:", err);
+    throw new Error('Failed to upload image. Please try again.');
+  }
+};
+
   const handleEditToggle = async () => {
     if (isEditing) {
       // Save changes
@@ -47,16 +87,13 @@ const Dashboard = () => {
         // Create form data if we have a new image to upload
         const updatedProfile = { ...editedUser };
         
-        // If using file uploads, you'd handle the image upload here
-        // and then add the resulting URL to updatedProfile.profileImage
-        
-        // For example:
-        // if (newImageFile) {
-        //   const formData = new FormData();
-        //   formData.append('profileImage', newImageFile);
-        //   const uploadResponse = await axios.post('/api/upload', formData);
-        //   updatedProfile.profileImage = uploadResponse.data.imageUrl;
-        // }
+        // Upload the image if we have a new one
+        if (imageFile) {
+          const imageUrl = await uploadImg(imageFile);
+          if (imageUrl) {
+            updatedProfile.profileImage = imageUrl;
+          }
+        }
         
         // Update profile in database
         const response = await axios.put(
@@ -69,6 +106,9 @@ const Dashboard = () => {
         if (response.data && setUser) {
           setUser(response.data);
         }
+        
+        // Clear temporary states
+        setImageFile(null);
         
         setIsLoading(false);
       } catch (err) {
@@ -90,12 +130,12 @@ const Dashboard = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Save the file for later upload
+      setImageFile(file);
+      
       // Create a preview URL for the selected image
       const imageUrl = URL.createObjectURL(file);
       setPreviewImage(imageUrl);
-      
-      // In a real app, you'd upload the file to your server/cloud storage
-      // For now, we'll just update the local state for the preview
     }
   };
 
@@ -183,7 +223,7 @@ const Dashboard = () => {
           </div>
         </div>
         
-        {/* User info and stats */}
+        {/* Rest of your component remains unchanged */}
         <div className="profile-info">
                     
           {/* Stats - items, followers, following */}
@@ -227,6 +267,7 @@ const Dashboard = () => {
         </div>
       </div>
       
+      {/* Remaining component code stays the same */}
       <div className="profile-tabs">
         <button 
           className={`profile-tab ${activeTab === 'grid' ? 'active' : ''}`}

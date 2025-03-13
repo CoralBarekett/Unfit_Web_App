@@ -18,6 +18,7 @@ dotenv.config();
 
 // Import passport configuration
 import './config/passport';
+import fileRoutes from './routes/fileRoutes';
 
 const initApp = () => {
     return new Promise<Express>(async (resolve, reject) => {
@@ -58,13 +59,15 @@ const initApp = () => {
             app.use(passport.initialize());
             
             // Serve static files from the uploads directory
-            app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+            app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
             
             // Routes
             app.use('/posts', postsRoutes);
             app.use('/comments', commentsRoutes);
             app.use('/auth', authRoutes);
-            
+
+            app.use('/file', fileRoutes);
+
             resolve(app);
         } catch (error) {
             console.error('Error initializing app:', error);

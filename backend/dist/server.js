@@ -29,6 +29,7 @@ const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 dotenv_1.default.config();
 // Import passport configuration
 require("./config/passport");
+const fileRoutes_1 = __importDefault(require("./routes/fileRoutes"));
 const initApp = () => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
@@ -62,11 +63,12 @@ const initApp = () => {
             // Initialize Passport
             app.use(passport_1.default.initialize());
             // Serve static files from the uploads directory
-            app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, '../uploads')));
+            app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, 'uploads')));
             // Routes
             app.use('/posts', postsRoutes_1.default);
             app.use('/comments', commentsRoutes_1.default);
             app.use('/auth', authRoutes_1.default);
+            app.use('/file', fileRoutes_1.default);
             resolve(app);
         }
         catch (error) {
