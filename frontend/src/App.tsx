@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import AutoThemeProvider from './components/theme/AutoThemeProvider';
 import HistoryManager from './components/common/HistoryManager';
@@ -11,6 +11,7 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import OAuthCallback from './components/auth/OAuthCallback';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import PostModal from './components/PostModal';
 import './App.css';
 
 // Component to scroll to top on route change
@@ -25,6 +26,8 @@ const ScrollToTop: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   // Force cache busting for the entire app
   useEffect(() => {
     // Add a random query parameter to all internal links to prevent caching
@@ -57,6 +60,14 @@ const App: React.FC = () => {
     };
   }, []);
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <AutoThemeProvider>
       <HistoryManager />
@@ -88,6 +99,14 @@ const App: React.FC = () => {
             </Routes>
           </div>
         </main>
+        
+        {/* Floating action button matching Dashboard.css aesthetic */}
+        <button onClick={handleOpenModal} className="fab-button">
+          <span className="plus-icon">+</span>
+        </button>
+        
+        {/* Post Creation Modal */}
+        <PostModal isOpen={isModalOpen} onClose={handleCloseModal} />
       </div>
     </AutoThemeProvider>
   );

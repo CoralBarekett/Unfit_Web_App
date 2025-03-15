@@ -6,6 +6,9 @@ import swaggerConfig from './swaggerConfig';
 import dotenv from 'dotenv';
 import fileRoutes from './routes/fileRoutes';
 import path from 'path';
+import postsRoutes from './routes/postsRoutes';
+import commentsRoutes from './routes/commentsRoutes';
+
 
 dotenv.config();
 const port = process.env.PORT || 3001;
@@ -28,6 +31,8 @@ const startServer = async () => {
         // Add Swagger UI to your app
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
+        app.use('/api/posts', postsRoutes);
+        app.use('/api/comments', commentsRoutes);
         // Start the server
         app.listen(port, () => {
             console.log(`Server started at http://localhost:${port}`);

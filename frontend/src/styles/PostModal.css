@@ -1,0 +1,68 @@
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1010;
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    background: var(--background, white);
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  
+  /* Modal Header */
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color, #dbdbdb);
+  }
+  
+  .modal-title {
+    font-weight: 600;
+    font-size: 1rem;
+    text-align: center;
+    flex: 1;
+  }
+  
+  .modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--text-dark, #262626);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Modal Body */
+  .modal-body {
+    padding: 0;
+  }
+  
+  /* Override some PostForm styles when it's in the modal */
+  .modal-body .post-form-container {
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+  }
+  
+  .modal-body .post-form {
+    padding: 1rem;
+  }
