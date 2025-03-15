@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import postService, { CreatePostData } from '../services/postService';
-import fileService from '../services/fileService';
-import '../styles/PostFormModal.css';
+import postService, { CreatePostData } from '../../services/postService';
+import fileService from '../../services/fileService';
+import '../../styles/PostFormModal.css';
 
 interface PostFormProps {
   isEditing?: boolean;

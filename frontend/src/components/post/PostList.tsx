@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PostItem from './PostItem';
-import postService, { Post } from '../services/postService';
+import postService, { Post } from '../../services/postService';
 import Pagination from './Pagination';
 import './PostList.css';
 

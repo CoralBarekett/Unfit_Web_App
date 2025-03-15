@@ -1,6 +1,6 @@
 import React from 'react';
 import PostForm from './PostForm';
-import '../styles/PostModal.css';
+import '../../styles/PostModal.css';
 
 interface PostModalProps {
   isOpen: boolean;

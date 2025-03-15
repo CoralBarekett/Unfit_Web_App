@@ -11,7 +11,7 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import OAuthCallback from './components/auth/OAuthCallback';
 import ProtectedRoute from './components/common/ProtectedRoute';
-import PostModal from './components/PostModal';
+import PostModal from './components/post/PostModal';
 import './App.css';
 
 // Component to scroll to top on route change
