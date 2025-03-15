@@ -185,7 +185,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Login user
+    // Login user
   const login = async (email: string, password: string): Promise<boolean> => {
     setError(null);
     try {
@@ -197,8 +197,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.data && response.data.accessToken) {
         localStorage.setItem('accessToken', response.data.accessToken);
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
-        setUser(response.data.user);
-        setIsAuthenticated(true);
+
+        try {
+          const userResponse = await axios.get(`${AUTH_API}/user`);
+          if (userResponse.data && userResponse.data._id) {
+            setUser(userResponse.data);
+            setIsAuthenticated(true);
+            return true;
+          }
+        } catch (userErr) {
+          console.error('Error fetching full user data after login:', userErr);
+          setUser(response.data.user);
+          setIsAuthenticated(true);
+        }
         
         return true;
       }
