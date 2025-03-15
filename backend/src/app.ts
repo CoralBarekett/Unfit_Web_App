@@ -8,7 +8,7 @@ import fileRoutes from './routes/fileRoutes';
 import path from 'path';
 
 dotenv.config();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3001;
 
 const startServer = async () => {
     try {
