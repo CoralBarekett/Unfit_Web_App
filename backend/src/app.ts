@@ -13,6 +13,8 @@ const port = process.env.PORT || 5000;
 const startServer = async () => {
     try {
         const app = await appInit();
+        
+        console.log('Uploads directory:', path.join(__dirname, 'uploads'));
 
         // Serve static files from 'uploads' directory
         app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

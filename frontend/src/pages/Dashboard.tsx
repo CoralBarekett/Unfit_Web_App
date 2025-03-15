@@ -19,17 +19,27 @@ const Dashboard = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   
-  // Update local state when user data changes
   useEffect(() => {
+    const refreshUserData = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:3001'}/auth/user`,
+          { withCredentials: true }
+        );
+        
+        if (response.data && setUser) {
+          setUser(response.data);
+        }
+      } catch (err) {
+        console.error('Error fetching user data:', err);
+      }
+    };
+    
     if (user) {
-      setEditedUser({
-        username: user.username || 'username',
-        bio: user.bio || '',
-        profileImage: user.profileImage || ''
-      });
+      refreshUserData();
     }
-  }, [user]);
-  
+  }, [user, setUser]);  
+
   // Sample data (need to be replaced with actual data from the backend)
   const stats = {
     items: 0,
@@ -70,7 +80,12 @@ const uploadImg = async (file: File) => {
     );
     
     console.log("Upload response:", response);
-    return response.data.url;
+
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:3001';
+    const imageUrl = `${apiUrl}/uploads/${filename}`;
+    
+    return imageUrl;
+
   } catch (err) {
     console.error("Error uploading image:", err);
     throw new Error('Failed to upload image. Please try again.');
@@ -87,20 +102,21 @@ const uploadImg = async (file: File) => {
         // Create form data if we have a new image to upload
         const updatedProfile = { ...editedUser };
         
-        // Upload the image if we have a new one
+          // Upload the image if we have a new one
         if (imageFile) {
           const imageUrl = await uploadImg(imageFile);
           if (imageUrl) {
             updatedProfile.profileImage = imageUrl;
           }
         }
-        
+
         // Update profile in database
         const response = await axios.put(
-          `${import.meta.env.VITE_API_URL|| 'http://localhost:3001'}/auth/profile`, 
+          `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:3001'}/auth/profile`, 
           updatedProfile,
           { withCredentials: true }
         );
+
         
         // Update user in context if successful
         if (response.data && setUser) {
