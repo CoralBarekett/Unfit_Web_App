@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Post } from '../../services/postService';
 import { FaThumbsUp, FaRegThumbsUp, FaComment, FaEdit, FaTrash } from 'react-icons/fa';
-import './PostItem.css';
+import '../../styles/PostItem.css';
 
 interface PostItemProps {
   post: Post;
