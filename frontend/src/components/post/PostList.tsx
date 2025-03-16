@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
 import PostItem from './PostItem';
 import postService, { Post } from '../../services/postService';
 import Pagination from './Pagination';
@@ -20,7 +20,7 @@ const PostList: React.FC<PostListProps> = ({ currentUserId, filterMyPosts = fals
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   useEffect(() => {
     fetchPosts();

@@ -54,7 +54,8 @@ const initApp = () => {
                 origin: [
                     process.env.FRONTEND_URL || 'http://localhost:5173',
                     'http://localhost:5173',
-                    'http://127.0.0.1:5173'
+                    'http://127.0.0.1:5173',
+                    'https://node01.cs.colman.ac.il'
                 ],
                 credentials: true, // Important for cookies to work cross-origin
                 methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

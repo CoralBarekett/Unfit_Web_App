@@ -65,6 +65,7 @@ const uploadImg = async (file: File) => {
       : fileExtension === 'gif' 
         ? 'image/gif' 
         : 'image/jpeg';
+    console.log(contentType);
     
     // Generate a unique filename using timestamp
     const filename = `profile_${Date.now()}.${fileExtension}`;
