@@ -159,10 +159,12 @@ import { authMiddleware } from '../controllers/authController';
  *         description: Post not found
  */
 
+router.get('/my-posts', authMiddleware, postController.getMyPosts.bind(postController));
 router.get('/:id', postController.getById.bind(postController));
 router.get('/', postController.getAll.bind(postController));
 router.post('/', authMiddleware, postController.create.bind(postController));
 router.put('/:id', authMiddleware, postController.update.bind(postController));
 router.delete('/:id', authMiddleware, postController.deleteItem.bind(postController));
+router.post('/:id/like', authMiddleware, postController.toggleLike.bind(postController));
 
 export default router;

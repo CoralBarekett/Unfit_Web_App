@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Routes, Route, useLocation, useParams } from 'react-router-dom';
 import AutoThemeProvider from './components/theme/AutoThemeProvider';
 import HistoryManager from './components/common/HistoryManager';
 import RouteManager from './components/common/RouteManager';
@@ -11,6 +11,8 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import OAuthCallback from './components/auth/OAuthCallback';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import PostModal from './components/post/PostModal';
+import PostForm from './components/post/PostForm';
 import './App.css';
 
 // Component to scroll to top on route change
@@ -24,7 +26,15 @@ const ScrollToTop: React.FC = () => {
   return null;
 };
 
+// Component to handle post editing
+const EditPost: React.FC = () => {
+  const { postId } = useParams();
+  return <PostForm isEditing={true} postId={postId} />;
+};
+
 const App: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   // Force cache busting for the entire app
   useEffect(() => {
     // Add a random query parameter to all internal links to prevent caching
@@ -57,6 +67,14 @@ const App: React.FC = () => {
     };
   }, []);
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <AutoThemeProvider>
       <HistoryManager />
@@ -80,6 +98,35 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
+              
+              {/* Add routes for post actions */}
+              <Route 
+                path="/posts/edit/:postId" 
+                element={
+                  <ProtectedRoute>
+                    <EditPost />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route 
+                path="/my-posts" 
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route 
+                path="/posts/:postId/comments" 
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              
               {/* Add a catch-all route for any unmatched routes */}
               <Route
                 path="*"
@@ -88,6 +135,14 @@ const App: React.FC = () => {
             </Routes>
           </div>
         </main>
+        
+        {/* Floating action button matching Dashboard.css aesthetic */}
+        <button onClick={handleOpenModal} className="fab-button">
+          <span className="plus-icon">+</span>
+        </button>
+        
+        {/* Post Creation Modal */}
+        <PostModal isOpen={isModalOpen} onClose={handleCloseModal} />
       </div>
     </AutoThemeProvider>
   );

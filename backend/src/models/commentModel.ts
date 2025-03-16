@@ -3,13 +3,13 @@ const Schema = mongoose.Schema;
 
 export interface IComment {
   _id?: string;
-  comment: string;
+  content: string;
   owner: string;
   postId: string;
 };
 
 const commentsSchema = new Schema<IComment>({
-  comment: {
+  content: {
     type: String,
     required: true,
   },

@@ -21,10 +21,11 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const fileRoutes_1 = __importDefault(require("./routes/fileRoutes"));
 const path_1 = __importDefault(require("path"));
 dotenv_1.default.config();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3001;
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const app = yield (0, server_1.default)();
+        console.log('Uploads directory:', path_1.default.join(__dirname, 'uploads'));
         // Serve static files from 'uploads' directory
         app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, 'uploads')));
         // Use file routes

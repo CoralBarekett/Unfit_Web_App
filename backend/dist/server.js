@@ -65,8 +65,8 @@ const initApp = () => {
             // Serve static files from the uploads directory
             app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, 'uploads')));
             // Routes
-            app.use('/posts', postsRoutes_1.default);
-            app.use('/comments', commentsRoutes_1.default);
+            app.use('/api/posts', postsRoutes_1.default);
+            app.use('/api/comments', commentsRoutes_1.default);
             app.use('/auth', authRoutes_1.default);
             app.use('/file', fileRoutes_1.default);
             resolve(app);

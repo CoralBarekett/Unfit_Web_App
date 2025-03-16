@@ -154,5 +154,7 @@ router.get('/', commentController.getAll.bind(commentController));
 router.post('/', authMiddleware, commentController.create.bind(commentController));
 router.delete('/:id', authMiddleware, commentController.deleteItem.bind(commentController));
 router.put('/:id', commentController.update.bind(commentController));
+router.get('/post/:postId', commentController.getByPostId.bind(commentController));
+router.put('/:id', authMiddleware, commentController.update.bind(commentController));
 
 export default router;
