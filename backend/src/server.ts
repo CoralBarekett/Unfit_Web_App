@@ -7,6 +7,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import path from 'path';
+import aiRoutes from './routes/aiRoutes';
 
 // Import routes
 import postsRoutes from './routes/postsRoutes';
@@ -68,6 +69,8 @@ const initApp = () => {
             app.use('/auth', authRoutes);
 
             app.use('/file', fileRoutes);
+
+            app.use('/api/ai', aiRoutes);
 
             resolve(app);
         } catch (error) {
