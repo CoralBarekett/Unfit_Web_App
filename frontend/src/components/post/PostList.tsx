@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PostItem from './PostItem';
 import postService, { Post } from '../../services/postService';
 import Pagination from './Pagination';
+import PostModal from './PostModal';
 import '../../styles/PostList.css';
 
 interface PostListProps {
@@ -15,6 +17,7 @@ const PostList: React.FC<PostListProps> = ({ currentUserId, filterMyPosts = fals
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,6 +68,12 @@ const PostList: React.FC<PostListProps> = ({ currentUserId, filterMyPosts = fals
     window.scrollTo(0, 0);
   };
 
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    // Refresh posts after modal closes to show any newly created posts
+    fetchPosts();
+  };
+
   if (loading) {
     return <div className="loading">Loading posts...</div>;
   }
@@ -75,7 +84,7 @@ const PostList: React.FC<PostListProps> = ({ currentUserId, filterMyPosts = fals
         <h2>{filterMyPosts ? 'My Posts' : 'All Posts'}</h2>
         <button 
           className="new-post-button" 
-          onClick={() => navigate('/posts/new')}
+          onClick={() => setIsModalOpen(true)}
         >
           Create New Post
         </button>
@@ -104,6 +113,12 @@ const PostList: React.FC<PostListProps> = ({ currentUserId, filterMyPosts = fals
           )}
         </>
       )}
+
+      {/* Use your existing PostModal component */}
+      <PostModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+      />
     </div>
   );
 };
