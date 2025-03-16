@@ -3,6 +3,7 @@ import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/Dashboard.css';
 import axios from 'axios';
+import PostList from '../components/post/PostList'; 
 
 const Dashboard = () => {
   const { user, setUser } = useContext(AuthContext);
@@ -42,7 +43,7 @@ const Dashboard = () => {
 
   // Sample data (need to be replaced with actual data from the backend)
   const stats = {
-    items: 0,
+    items: user ? 1 : 0, // We'll replace this with actual post count
     followers: 348,
     following: 562,
     savedItems: 0,
@@ -283,7 +284,7 @@ const uploadImg = async (file: File) => {
         </div>
       </div>
       
-      {/* Remaining component code stays the same */}
+      {/* Tabs section */}
       <div className="profile-tabs">
         <button 
           className={`profile-tab ${activeTab === 'grid' ? 'active' : ''}`}
@@ -318,22 +319,18 @@ const uploadImg = async (file: File) => {
         </button>
       </div>
       
-      {/* Grid of items */}
-      {activeTab === 'grid' && stats.items > 0 && (
-        <div className="items-grid">
-          {Array.from({length: stats.items}).map((_, i) => (
-            <div key={i} className="item-card">
-              <img 
-                src={`/api/placeholder/300/300`} 
-                alt={`Item ${i+1}`}
-              />
-            </div>
-          ))}
+      {/* Posts tab - New implementation */}
+      {activeTab === 'grid' && user && (
+        <div className="profile-posts">
+          <PostList 
+            currentUserId={user._id} 
+            filterMyPosts={true} 
+          />
         </div>
       )}
 
-      {/* Empty state if no items */}
-      {activeTab === 'grid' && stats.items === 0 && (
+      {/* Empty state if no user */}
+      {activeTab === 'grid' && !user && (
         <div className="empty-state">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
