@@ -1,10 +1,10 @@
 // aiRoutes.ts
 import express from "express";
 import { generatePostContent } from "../controllers/aiController";
-//import { aiRateLimiter } from "../services/aiService";
 
 const router = express.Router();
 
-router.post("/generate-content", generatePostContent);
+// Use the handler directly but with explicit typing
+router.post("/generate-content", generatePostContent as express.RequestHandler);
 
 export default router;
