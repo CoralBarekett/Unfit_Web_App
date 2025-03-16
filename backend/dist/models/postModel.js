@@ -18,7 +18,19 @@ const postSchema = new Schema({
         type: String,
         required: true,
     },
-});
+    image: {
+        type: String,
+        required: false,
+    },
+    likes: {
+        type: [String],
+        default: [],
+    },
+    commentCount: {
+        type: Number,
+        default: 0,
+    }
+}, { timestamps: true });
 const postModel = mongoose_1.default.model("Posts", postSchema);
 exports.default = postModel;
 //# sourceMappingURL=postModel.js.map

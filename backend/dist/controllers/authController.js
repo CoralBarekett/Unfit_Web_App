@@ -305,7 +305,6 @@ const facebookCallback = (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=Authentication%20failed`);
     }
 });
-// Auth middleware - exported separately from the controller object
 const authMiddleware = (req, res, next) => {
     try {
         // Check Authorization header first

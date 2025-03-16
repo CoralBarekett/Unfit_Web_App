@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+axios.defaults.baseURL = 'http://localhost:3001';
+axios.defaults.withCredentials = true;
+
 const API_URL = '/api/posts';
 
     export interface Post {

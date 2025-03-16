@@ -62,8 +62,8 @@ const initApp = () => {
             app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
             
             // Routes
-            app.use('/posts', postsRoutes);
-            app.use('/comments', commentsRoutes);
+            app.use('/api/posts', postsRoutes);
+            app.use('/api/comments', commentsRoutes);
             app.use('/auth', authRoutes);
 
             app.use('/file', fileRoutes);

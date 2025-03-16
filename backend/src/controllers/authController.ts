@@ -409,7 +409,6 @@ const facebookCallback = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-// Auth middleware - exported separately from the controller object
 export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     try {
         // Check Authorization header first

@@ -65,49 +65,71 @@ const PostForm: React.FC<PostFormProps> = ({ isEditing = false, onFormComplete }
     setImageUrl('');
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  
+  if (!title.trim() || !content.trim()) {
+    setError('Title and content are required');
+    return;
+  }
+  
+  try {
+    setLoading(true);
+    let finalImageUrl = imageUrl;
     
-    if (!title.trim() || !content.trim()) {
-      setError('Title and content are required');
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      let finalImageUrl = imageUrl;
-      
-      // Upload new image if selected
-      if (imageFile) {
+    // Upload new image if selected
+    if (imageFile) {
+      console.log('Uploading image file:', imageFile.name);
+      try {
         finalImageUrl = await fileService.uploadImage(imageFile);
+        console.log('Image uploaded successfully, URL:', finalImageUrl);
+      } catch (uploadError) {
+        console.error('Image upload failed:', uploadError);
+        // Continue without the image if upload fails
+        finalImageUrl = '';
       }
-      
-      const postData: CreatePostData = {
-        title,
-        content,
-        imageUrl: finalImageUrl || undefined
-      };
-      
-      if (isEditing && id) {
-        await postService.updatePost(id, postData);
-      } else {
-        await postService.createPost(postData);
-      }
-      
-      // Call the onFormComplete callback if provided (for modal)
-      if (onFormComplete) {
-        onFormComplete();
-      } else {
-        // Otherwise navigate as before
-        navigate(isEditing ? '/my-posts' : '/');
-      }
-    } catch (error) {
-      console.error('Error saving post:', error);
-      setError('Error saving post. Please try again.');
-    } finally {
-      setLoading(false);
     }
-  };
+    
+    const postData: CreatePostData = {
+      title,
+      content,
+      imageUrl: finalImageUrl || undefined
+    };
+    
+    console.log('Submitting post data:', postData);
+    
+    if (isEditing && id) {
+      console.log(`Updating post with ID: ${id}`);
+      await postService.updatePost(id, postData);
+    } else {
+      console.log('Creating new post');
+      await postService.createPost(postData);
+    }
+    
+    console.log('Post saved successfully');
+    
+    // Call the onFormComplete callback if provided (for modal)
+    if (onFormComplete) {
+      onFormComplete();
+    } else {
+      // Otherwise navigate as before
+      navigate(isEditing ? '/my-posts' : '/');
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Error saving post details:', error.message);
+      if ((error as any)?.response) {
+        console.error('Response status:', (error as any).response.status);
+        console.error('Response data:', (error as any).response.data);
+      }
+    } else {
+      console.error('Unknown error saving post:', error);
+    }
+    setError('Error saving post. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading && isEditing) {
     return <div className="loading">Loading post data...</div>;

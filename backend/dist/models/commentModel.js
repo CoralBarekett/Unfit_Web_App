@@ -7,7 +7,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const Schema = mongoose_1.default.Schema;
 ;
 const commentsSchema = new Schema({
-    comment: {
+    content: {
         type: String,
         required: true,
     },

@@ -153,5 +153,7 @@ router.get('/', commentController_1.default.getAll.bind(commentController_1.defa
 router.post('/', authController_1.authMiddleware, commentController_1.default.create.bind(commentController_1.default));
 router.delete('/:id', authController_1.authMiddleware, commentController_1.default.deleteItem.bind(commentController_1.default));
 router.put('/:id', commentController_1.default.update.bind(commentController_1.default));
+router.get('/post/:postId', commentController_1.default.getByPostId.bind(commentController_1.default));
+router.put('/:id', authController_1.authMiddleware, commentController_1.default.update.bind(commentController_1.default));
 exports.default = router;
 //# sourceMappingURL=commentsRoutes.js.map

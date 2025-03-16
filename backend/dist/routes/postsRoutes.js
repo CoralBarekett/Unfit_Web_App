@@ -158,10 +158,12 @@ const authController_1 = require("../controllers/authController");
  *       404:
  *         description: Post not found
  */
+router.get('/my-posts', authController_1.authMiddleware, postController_1.default.getMyPosts.bind(postController_1.default));
 router.get('/:id', postController_1.default.getById.bind(postController_1.default));
 router.get('/', postController_1.default.getAll.bind(postController_1.default));
 router.post('/', authController_1.authMiddleware, postController_1.default.create.bind(postController_1.default));
 router.put('/:id', authController_1.authMiddleware, postController_1.default.update.bind(postController_1.default));
 router.delete('/:id', authController_1.authMiddleware, postController_1.default.deleteItem.bind(postController_1.default));
+router.post('/:id/like', authController_1.authMiddleware, postController_1.default.toggleLike.bind(postController_1.default));
 exports.default = router;
 //# sourceMappingURL=postsRoutes.js.map

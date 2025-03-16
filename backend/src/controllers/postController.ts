@@ -10,17 +10,53 @@ class PostsController extends BaseController<IPost> {
 
     async create(req: Request, res: Response): Promise<void> {
         const userId = req.body.userId;
+        
+        // Map imageUrl to image if needed
+        const imageField = req.body.imageUrl ? { image: req.body.imageUrl } : {};
+        
         const post = {
             ...req.body,
             owner: userId,
             likes: [],
-            commentCount: 0
+            commentCount: 0,
+            ...imageField // Add the image field if imageUrl exists
         };
+        
         req.body = post;
         try {
             await super.create(req, res);
         } catch (error) {
             res.status(500).json({ error: "Error creating post" });
+        }
+    }
+    
+    async update(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.body.userId;
+            const postId = req.params.id;
+            
+            // Find post to verify ownership
+            const post = await this.model.findById(postId);
+            if (!post) {
+                res.status(404).json({ error: "Post not found" });
+                return;
+            }
+            
+            // Check if user owns this post
+            if (post.owner !== userId) {
+                res.status(403).json({ error: "Not authorized to update this post" });
+                return;
+            }
+            
+            // Map imageUrl to image if needed
+            if (req.body.imageUrl) {
+                req.body.image = req.body.imageUrl;
+                delete req.body.imageUrl;
+            }
+            
+            await super.update(req, res);
+        } catch (error) {
+            res.status(500).json({ error: "Error updating post" });
         }
     }
     
