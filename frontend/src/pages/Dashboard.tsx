@@ -325,6 +325,7 @@ const uploadImg = async (file: File) => {
           <PostList 
             currentUserId={user._id} 
             filterMyPosts={true} 
+            isInDashboard={true}
           />
         </div>
       )}

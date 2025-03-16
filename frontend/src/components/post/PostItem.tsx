@@ -78,9 +78,7 @@ const PostItem: React.FC<PostItemProps> = ({
   };
 
   const toggleComments = () => {
-    if (isInDashboard) {
-      setShowComments(!showComments);
-    }
+    setShowComments(!showComments);
   };
 
   return (
@@ -111,7 +109,6 @@ const PostItem: React.FC<PostItemProps> = ({
         </button>
         
         {isInDashboard ? (
-          // On dashboard, clicking shows comments directly
           <button 
             className={`comment-button ${showComments ? 'active' : ''}`}
             onClick={toggleComments}
@@ -119,7 +116,6 @@ const PostItem: React.FC<PostItemProps> = ({
             <FaComment /> {post.commentCount} {showComments ? 'Hide Comments' : 'Show Comments'}
           </button>
         ) : (
-          // On home page, just show comment count and form
           <button 
             className="comment-button"
             onClick={() => setShowComments(!showComments)}
@@ -142,47 +138,50 @@ const PostItem: React.FC<PostItemProps> = ({
       
       {/* Show comment form on any post when toggled */}
       {showComments && (
-        <div className="comments-section">
-          <form onSubmit={handleSubmitComment} className="comment-form">
-            <textarea
-              placeholder="Write a comment..."
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              className="comment-input"
-              rows={2}
-            />
-            <button 
-              type="submit" 
-              className="comment-submit-btn"
-              disabled={submitLoading || !commentText.trim()}
-            >
-              {submitLoading ? 'Posting...' : 'Post Comment'}
-            </button>
-          </form>
+  <div className="comments-section">
+    <form onSubmit={handleSubmitComment} className="comment-form">
+      <textarea
+        placeholder="Write a comment..."
+        value={commentText}
+        onChange={(e) => setCommentText(e.target.value)}
+        className="comment-input"
+        rows={2}
+      />
+      <button 
+        type="submit" 
+        className="comment-submit-btn"
+        disabled={submitLoading || !commentText.trim()}
+      >
+        {submitLoading ? 'Posting...' : 'Post Comment'}
+      </button>
+    </form>
           
           {/* Only show comment list on dashboard */}
           {isInDashboard && (
-            loading ? (
-              <div className="loading-comments">Loading comments...</div>
-            ) : comments.length === 0 ? (
-              <div className="no-comments">No comments yet</div>
-            ) : (
-              <div className="comments-list">
-                {comments.map(comment => (
-                  <div key={comment._id} className="comment-item">
-                    <div className="comment-content">{comment.content}</div>
-                    <div className="comment-meta">
-                      <small>{new Date(comment.createdAt).toLocaleString()}</small>
-                    </div>
-                  </div>
-                ))}
+      <div className="comments-container">
+        <h4 className="comments-heading">Comments ({comments.length})</h4>
+        {loading ? (
+          <div className="loading-comments">Loading comments...</div>
+        ) : comments.length === 0 ? (
+          <div className="no-comments">No comments yet</div>
+        ) : (
+          <div className="comments-list">
+            {comments.map(comment => (
+              <div key={comment._id} className="comment-item">
+                <div className="comment-content">{comment.content}</div>
+                <div className="comment-meta">
+                  <small>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : 'Just now'}</small>
+                </div>
               </div>
-            )
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
+            ))}
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+)}
+</div>
+);
+}
 
 export default PostItem;

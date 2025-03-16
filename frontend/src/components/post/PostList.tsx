@@ -10,7 +10,9 @@ import '../../styles/PostList.css';
 interface PostListProps {
   currentUserId: string;
   filterMyPosts?: boolean;
-}
+    isInDashboard?: boolean;
+  }
+
 
 const PostList: React.FC<PostListProps> = ({ currentUserId, filterMyPosts = false }) => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -102,7 +104,8 @@ const PostList: React.FC<PostListProps> = ({ currentUserId, filterMyPosts = fals
               onDelete={handleDeletePost}
               onLike={handleLikePost}
               // Only show comment form on dashboard (my posts)
-              showCommentForm={filterMyPosts}
+              //showCommentForm={filterMyPosts}
+              isInDashboard={filterMyPosts}
             />
           ))}
           
