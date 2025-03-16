@@ -5,17 +5,17 @@ axios.defaults.withCredentials = true;
 
 const API_URL = '/api/posts';
 
-    export interface Post {
+export interface Post {
     _id: string;
     title: string;
     content: string;
-    owner: string;
     imageUrl?: string;
+    owner: string;
     likes: string[];
     commentCount: number;
     createdAt: string;
     updatedAt: string;
-    }
+  }
 
     export interface CreatePostData {
     title: string;

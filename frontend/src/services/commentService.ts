@@ -18,6 +18,8 @@ class CommentService {
   }
 
   async createComment(postId: string, content: string): Promise<Comment> {
+    // The backend expects a userId, but it will be extracted from the auth token
+    // So we just need to provide postId and content
     const response = await axios.post(API_URL, { postId, content });
     return response.data;
   }
@@ -33,4 +35,3 @@ class CommentService {
 }
 
 export default new CommentService();
-

@@ -101,6 +101,8 @@ const PostList: React.FC<PostListProps> = ({ currentUserId, filterMyPosts = fals
               currentUserId={currentUserId}
               onDelete={handleDeletePost}
               onLike={handleLikePost}
+              // Only show comment form on dashboard (my posts)
+              showCommentForm={filterMyPosts}
             />
           ))}
           
