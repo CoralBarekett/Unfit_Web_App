@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, useParams } from 'react-router-dom';
 import AutoThemeProvider from './components/theme/AutoThemeProvider';
 import HistoryManager from './components/common/HistoryManager';
 import RouteManager from './components/common/RouteManager';
@@ -12,6 +12,7 @@ import Register from './components/auth/Register';
 import OAuthCallback from './components/auth/OAuthCallback';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import PostModal from './components/post/PostModal';
+import PostForm from './components/post/PostForm';
 import './App.css';
 
 // Component to scroll to top on route change
@@ -23,6 +24,12 @@ const ScrollToTop: React.FC = () => {
   }, [pathname]);
 
   return null;
+};
+
+// Component to handle post editing
+const EditPost: React.FC = () => {
+  const { postId } = useParams();
+  return <PostForm isEditing={true} postId={postId} />;
 };
 
 const App: React.FC = () => {
@@ -91,6 +98,35 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
+              
+              {/* Add routes for post actions */}
+              <Route 
+                path="/posts/edit/:postId" 
+                element={
+                  <ProtectedRoute>
+                    <EditPost />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route 
+                path="/my-posts" 
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route 
+                path="/posts/:postId/comments" 
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              
               {/* Add a catch-all route for any unmatched routes */}
               <Route
                 path="*"
