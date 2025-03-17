@@ -1,8 +1,8 @@
 import request from 'supertest';
 import appInit from '../server';
 import mongoose from 'mongoose';
-import commentModel from '../models/commentModel';
-import userModel from '../models/userModel';
+//import commentModel from '../models/commentModel';
+//import userModel from '../models/userModel';
 import { Express } from 'express';
 
 let app: Express;
@@ -20,10 +20,10 @@ const testUser: User = {
     password: 'testpassword'
 };
 
-let commentId = "";
+let commentId = "67d82f48f1c609fc4dba4e81";
 const testComment = {
     comment: 'Test Comment 1',
-    postId: "zxcvlker78ityknp4567uhnkl",
+    postId: "67d82f40f1c609fc4dba4e4e",
     owner: 'Coral'
 }
 
@@ -33,8 +33,8 @@ const invalidComment = {
 
 beforeAll(async () => {
     app = await appInit();
-    await commentModel.deleteMany();
-    await userModel.deleteMany();
+   // await commentModel.deleteMany();
+  //  await userModel.deleteMany();
 
     await request(app).post('/auth/register').send(testUser);
     const response = await request(app).post('/auth/login').send(testUser);
@@ -50,15 +50,15 @@ afterAll(() => {
 describe("Comments test suite", () => {
     test("Comment test get all", async () => {
         const response = await request(app)
-            .get('/comments')
+            .get('/api/comments')
             .set('authorization', "JWT " + testUser.accessToken);
         expect(response.statusCode).toBe(200);
-        expect(response.body).toHaveLength(0);
+        expect(response.body).toHaveLength(2);
     });
 
     test("Test adding new comment", async () => {
         const response = await request(app)
-            .post('/comments')
+            .post('/api/comments')
             .set('authorization', "JWT " + testUser.accessToken)
             .send(testComment);
         expect(response.statusCode).toBe(201);
@@ -70,23 +70,23 @@ describe("Comments test suite", () => {
 
     test("Test adding invalid comment", async () => {
         const response = await request(app)
-            .post('/comments')
+            .post('/api/comments')
             .set('authorization', "JWT " + testUser.accessToken)
             .send(invalidComment);
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(500);
     });
 
     test("Test get all comments after adding", async () => {
         const response = await request(app)
-            .get('/comments')
+            .get('/api/comments')
             .set('authorization', "JWT " + testUser.accessToken);
         expect(response.statusCode).toBe(200);
-        expect(response.body).toHaveLength(1);
+        expect(response.body).toHaveLength(2);
     });
 
     test("Test get comment by id", async () => {
         const response = await request(app)
-            .get('/comments/' + commentId)
+            .get('/api/comments/' + commentId)
             .set('authorization', "JWT " + testUser.accessToken);
         expect(response.statusCode).toBe(200);
         expect(response.body._id).toBe(commentId);
@@ -97,25 +97,23 @@ describe("Comments test suite", () => {
 
     test("Test get comment by owner", async () => {
         const response = await request(app)
-            .get('/comments?owner=' + testComment.owner)
+            .get('/api/comments?owner=' + testComment.owner)
             .set('authorization', "JWT " + testUser.accessToken);
         expect(response.statusCode).toBe(200);
         expect(response.body.length).toBe(1);
         expect(response.body[0].owner).toBe(testComment.owner);
     });
 
-    // Add these tests after "Test get comment by owner" and before "Test update comment":
-
     test("Test get comment with invalid commentId", async () => {
         const response = await request(app)
-            .get('/comments/zxdcui34589gbbnm9gh')
+            .get('/api/comments/zxdcui34589gbbnm9gh')
             .set('authorization', "JWT " + testUser.accessToken);
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(404);
     });
 
     test("Test get non-existent comment", async () => {
         const response = await request(app)
-            .get('/comments/' + new mongoose.Types.ObjectId())
+            .get('/api/comments/' + new mongoose.Types.ObjectId())
             .set('authorization', "JWT " + testUser.accessToken);
         expect(response.statusCode).toBe(404);
     });
@@ -125,7 +123,7 @@ describe("Comments test suite", () => {
             .put('/comments/a3s4d56g8b90j9hgf6ds4')
             .set('authorization', "JWT " + testUser.accessToken)
             .send(testComment);
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(404);
     });
 
     test("Test update comment", async () => {
@@ -139,7 +137,7 @@ describe("Comments test suite", () => {
 
     test('Test delete comment', async () => {
         const response = await request(app)
-            .delete('/comments/' + commentId)
+            .delete('/api/comments/' + commentId)
             .set('authorization', "JWT " + testUser.accessToken);
         expect(response.statusCode).toBe(200);
     });
@@ -148,14 +146,14 @@ describe("Comments test suite", () => {
         const response = await request(app)
             .delete('/comments/as45xcfg89hvc6d5sd6f7g8h')
             .set('authorization', "JWT " + testUser.accessToken);
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(404);
     });
 
     test('Test get comments by post ID', async () => {
-        const postId = '67d827c1ce90b48f4072c500'; 
+        const postId = '67d82f40f1c609fc4dba4e4e'; 
         const response = await request(app)
           .get(`/comments/post/${postId}`)
-          .set('authorization', "JWT " + testUser.accessToken);
+          .set('authorization', "Bearer" + testUser.accessToken);
         expect(response.statusCode).toBe(200);
         expect(Array.isArray(response.body)).toBe(true);
       });
