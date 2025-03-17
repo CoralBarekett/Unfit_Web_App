@@ -222,7 +222,7 @@ describe("Auth Tests", () => {
         });
         expect(response.statusCode).not.toBe(201);
         const response2 = yield (0, supertest_1.default)(app)
-            .post("/posts")
+            .post("/api/posts")
             .set({ authorization: "JWT " + testUser.accessToken })
             .send({
             title: "Test Post",

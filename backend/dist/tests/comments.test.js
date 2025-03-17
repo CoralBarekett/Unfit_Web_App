@@ -135,5 +135,13 @@ describe("Comments test suite", () => {
             .set('authorization', "JWT " + testUser.accessToken);
         expect(response.statusCode).toBe(400);
     }));
+    test('Test get comments by post ID', () => __awaiter(void 0, void 0, void 0, function* () {
+        const postId = '67d827c1ce90b48f4072c500';
+        const response = yield (0, supertest_1.default)(app)
+            .get(`/comments/post/${postId}`)
+            .set('authorization', "JWT " + testUser.accessToken);
+        expect(response.statusCode).toBe(200);
+        expect(Array.isArray(response.body)).toBe(true);
+    }));
 });
 //# sourceMappingURL=comments.test.js.map

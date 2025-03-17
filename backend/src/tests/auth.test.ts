@@ -243,7 +243,7 @@ describe("Auth Tests", () => {
     });
     expect(response.statusCode).not.toBe(201);
     const response2 = await request(app)
-      .post("/posts")
+      .post("/api/posts")
       .set({ authorization: "JWT " + testUser.accessToken })
       .send({
         title: "Test Post",

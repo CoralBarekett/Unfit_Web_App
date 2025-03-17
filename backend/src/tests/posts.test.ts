@@ -53,7 +53,7 @@ afterAll(() => {
 
 describe("Posts test", () => {
     test("Test get all post empty", async () => {
-        const response = await request(app).get('/posts');
+        const response = await request(app).get('/api/posts');
         expect(response.statusCode).toBe(200);
         expect(response.body.length).toBe(0);
     });
@@ -81,7 +81,7 @@ describe("Posts test", () => {
     // Test invalid post creation
     test("Test create invalid post", async () => {
         const response = await request(app)
-            .post('/posts')
+            .post('/api/posts')
             .set({ authorization: "JWT " + testUser.accessToken })
             .send({
                 // Missing title and content
@@ -91,31 +91,31 @@ describe("Posts test", () => {
     });
 
     test("Test get all post", async () => {
-        const response = await request(app).get('/posts');
+        const response = await request(app).get('/api/posts');
         expect(response.statusCode).toBe(200);
         expect(response.body.length).toBe(testPosts.length);
     });
 
     test("Test get post by id", async () => {
-        const response = await request(app).get('/posts/' + testPosts[0]._id);
+        const response = await request(app).get('/api/posts/' + testPosts[0]._id);
         expect(response.statusCode).toBe(200);
         expect(response.body._id).toBe(testPosts[0]._id);
     });
 
     // Test get post with invalid ID
     test("Test get post with invalid id", async () => {
-        const response = await request(app).get('/posts/invalidid');
+        const response = await request(app).get('/api/posts/invalidid');
         expect(response.statusCode).toBe(400);
     });
 
     // Test get non-existent post
     test("Test get non-existent post", async () => {
-        const response = await request(app).get('/posts/' + new mongoose.Types.ObjectId());
+        const response = await request(app).get('/api/posts/' + new mongoose.Types.ObjectId());
         expect(response.statusCode).toBe(404);
     });
 
     test("Test get post by owner", async () => {
-        const response = await request(app).get('/posts?owner=' + ownerIdFromResponse);
+        const response = await request(app).get('/api/posts?owner=' + ownerIdFromResponse);
         expect(response.statusCode).toBe(200);
         expect(response.body.length).toBe(2);
     });
@@ -127,7 +127,7 @@ describe("Posts test", () => {
             owner: 'Coral'
         };
         const response = await request(app)
-            .put('/posts/' + testPosts[0]._id)
+            .put('/api/posts/' + testPosts[0]._id)
             .set({ authorization: "JWT " + testUser.accessToken })
             .send(newPost);
         expect(response.statusCode).toBe(200);
@@ -139,24 +139,24 @@ describe("Posts test", () => {
     // Test update with invalid ID
     test("Test update post with invalid id", async () => {
         const response = await request(app)
-            .put('/posts/3456tdfgy6567uy')
+            .put('/api/posts/3456tdfgy6567uy')
             .set({ authorization: "JWT " + testUser.accessToken })
             .send(testPosts[0]);
         expect(response.statusCode).toBe(400);
     });
 
     test('Test delete post', async () => {
-        const response = await request(app).delete('/posts/' + testPosts[0]._id)
+        const response = await request(app).delete('/api/posts/' + testPosts[0]._id)
             .set({ authorization: "JWT " + testUser.accessToken });
         expect(response.statusCode).toBe(200);
 
-        const responseGet = await request(app).get('/posts/' + testPosts[0]._id);
+        const responseGet = await request(app).get('/api/posts/' + testPosts[0]._id);
         expect(responseGet.statusCode).toBe(404);
     });
 
     // Test delete with invalid ID
     test("Test delete post with invalid id", async () => {
-        const response = await request(app).delete('/posts/s45d6fvbuj9gfh8jinf67gh')
+        const response = await request(app).delete('/api/posts/s45d6fvbuj9gfh8jinf67gh')
             .set({ authorization: "JWT " + testUser.accessToken });
         expect(response.statusCode).toBe(400);
     });

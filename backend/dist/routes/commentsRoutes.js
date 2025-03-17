@@ -148,12 +148,42 @@ const authController_1 = require("../controllers/authController");
  *       404:
  *         description: Comment not found
  */
+/**
+ * @swagger
+ * /comments/post/{postId}:
+ *   get:
+ *     summary: Get comments by post ID
+ *     tags:
+ *       - Comments
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         description: The ID of the post to get comments for
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of comments for the post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *                   author:
+ *                     type: string
+ */
 router.get('/:id', commentController_1.default.getById.bind(commentController_1.default));
 router.get('/', commentController_1.default.getAll.bind(commentController_1.default));
 router.post('/', authController_1.authMiddleware, commentController_1.default.create.bind(commentController_1.default));
 router.delete('/:id', authController_1.authMiddleware, commentController_1.default.deleteItem.bind(commentController_1.default));
-router.put('/:id', commentController_1.default.update.bind(commentController_1.default));
-router.get('/post/:postId', commentController_1.default.getByPostId.bind(commentController_1.default));
 router.put('/:id', authController_1.authMiddleware, commentController_1.default.update.bind(commentController_1.default));
+router.get('/post/:postId', commentController_1.default.getByPostId.bind(commentController_1.default));
 exports.default = router;
 //# sourceMappingURL=commentsRoutes.js.map

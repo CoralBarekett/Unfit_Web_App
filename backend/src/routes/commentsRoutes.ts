@@ -149,12 +149,43 @@ import { authMiddleware } from '../controllers/authController';
  *         description: Comment not found
  */
 
+/**
+ * @swagger
+ * /comments/post/{postId}:
+ *   get:
+ *     summary: Get comments by post ID
+ *     tags:
+ *       - Comments
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         description: The ID of the post to get comments for
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of comments for the post
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *                   author:
+ *                     type: string
+ */
+
 router.get('/:id', commentController.getById.bind(commentController));
 router.get('/', commentController.getAll.bind(commentController));
 router.post('/', authMiddleware, commentController.create.bind(commentController));
 router.delete('/:id', authMiddleware, commentController.deleteItem.bind(commentController));
-router.put('/:id', commentController.update.bind(commentController));
-router.get('/post/:postId', commentController.getByPostId.bind(commentController));
 router.put('/:id', authMiddleware, commentController.update.bind(commentController));
+router.get('/post/:postId', commentController.getByPostId.bind(commentController));
 
 export default router;
