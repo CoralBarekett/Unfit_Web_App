@@ -132,3 +132,39 @@
   background-color: #ccc;
   cursor: not-allowed;
 }
+
+/* Hide the default file input */
+.post-form input[type="file"] {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+/* Custom file upload button */
+.file-upload-label {
+  display: inline-block;
+  padding: 0.6rem 1.25rem;
+  background-color: var(#d78ad6);
+  color: white;
+  border: 1px solid var(--border-color, #dbdbdb);
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.file-upload-label:hover {
+  background-color: var(--primary-darker, #d78ad6);
+}
+
+/* File name display */
+.file-name-display {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-dark, #262626);
+}
