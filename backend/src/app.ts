@@ -20,7 +20,7 @@ const startServer = async () => {
     console.log("Uploads directory:", path.join(__dirname, "uploads"));
 
     // Serve static files from 'uploads' directory
-    app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+    app.use("/uploads", express.static(path.join(__dirname,'..', "uploads")));
 
     // Use file routes
     app.use("/file", fileRoutes);

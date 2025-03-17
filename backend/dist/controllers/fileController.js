@@ -46,7 +46,7 @@ const uploadFile = (req, res) => {
             return;
         }
         // Create URL for the uploaded file
-        const fileUrl = `/uploads/${req.file.filename}`; // Make sure this matches the static path
+        const fileUrl = `/uploads/${req.file.filename}`;
         // Return success response with the file URL
         res.status(200).json({
             success: true,

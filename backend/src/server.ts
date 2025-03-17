@@ -61,7 +61,7 @@ const initApp = () => {
             app.use(passport.initialize());
             
             // Serve static files from the uploads directory
-            app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+            app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
             
             // Routes
             app.use('/api/posts', postsRoutes);
