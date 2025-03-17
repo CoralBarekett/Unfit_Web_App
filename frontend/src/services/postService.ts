@@ -9,6 +9,7 @@ export interface Post {
   _id: string;
   title: string;
   content: string;
+  image?: string;
   imageUrl?: string;
   owner: string;
   likes: string[];

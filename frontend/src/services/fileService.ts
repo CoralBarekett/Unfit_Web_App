@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api/upload';
+const API_URL = '/file';
 
 interface UploadResponse {
   success: boolean;

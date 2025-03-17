@@ -39,25 +39,25 @@ export const upload = multer({
   }
 });
 
-export const uploadFile = (req: Request, res: Response): void => {
+export const uploadFile = (req: Request, res: Response) => {
   try {
     if (!req.file) {
-      res.status(400).json({ error: 'No file uploaded' });
+      res.status(400).json({ error: "No file uploaded" });
       return;
     }
-    
+
     // Create URL for the uploaded file
-    const fileUrl = `/uploads/${req.file.filename}`;
-    
+    const fileUrl = `/uploads/${req.file.filename}`; 
+
     // Return success response with the file URL
     res.status(200).json({
       success: true,
       url: fileUrl,
       filename: req.file.filename,
-      size: req.file.size
+      size: req.file.size,
     });
   } catch (error) {
-    console.error('File upload error:', error);
-    res.status(500).json({ error: 'File upload failed' });
+    console.error("File upload error:", error);
+    res.status(500).json({ error: "File upload failed" });
   }
 };

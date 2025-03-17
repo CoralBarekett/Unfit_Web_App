@@ -30,7 +30,7 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
         const app = yield (0, server_1.default)();
         console.log("Uploads directory:", path_1.default.join(__dirname, "uploads"));
         // Serve static files from 'uploads' directory
-        app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "uploads")));
+        app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, '..', "uploads")));
         // Use file routes
         app.use("/file", fileRoutes_1.default);
         // Generate Swagger documentation
