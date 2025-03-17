@@ -99,9 +99,9 @@ const PostItem: React.FC<PostItemProps> = ({
         </div>
       </div>
 
-      {post.imageUrl && (
+      {(post.image || post.imageUrl) && (
         <div className="post-image">
-          <img src={post.imageUrl} alt={post.title} />
+          <img src={post.image || post.imageUrl} alt={post.title} />
         </div>
       )}
 
