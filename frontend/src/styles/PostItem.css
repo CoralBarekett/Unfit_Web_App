@@ -176,14 +176,14 @@
 .comment-item {
   padding: 0.75rem;
   border-bottom: 1px solid var(--border-color, #444);
-  background-color: var(--background-light, transparent);
+  background-color: var(--background-light, #dba9da);
   border-radius: 8px;
   margin-bottom: 8px;
   transition: background-color 0.3s ease, opacity 0.3s ease;
 }
 
 .comment-item:hover {
-  background-color: var(--background-hover, #3c3c3c); 
+  background-color: var(--background-hover, #c174c0); 
   opacity: 0.95;  
 }
 
