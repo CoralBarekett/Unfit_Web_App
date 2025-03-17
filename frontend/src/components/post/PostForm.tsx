@@ -15,11 +15,13 @@ const PostForm: React.FC<PostFormProps> = ({ isEditing = false, postId, onFormCo
   
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [topic, setTopic] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     if (isEditing && postId) {
@@ -63,6 +65,27 @@ const PostForm: React.FC<PostFormProps> = ({ isEditing = false, postId, onFormCo
     setImageFile(null);
     setImagePreview('');
     setImageUrl('');
+  };
+  
+  const generateContent = async () => {
+    if (!title.trim()) {
+      setError('Please enter a title before generating content');
+      return;
+    }
+    
+    try {
+      setIsGenerating(true);
+      setError('');
+      
+      // Call the AI content generation endpoint
+      const generatedContent = await postService.generatePostContent(title, topic);
+      setContent(generatedContent);
+    } catch (error) {
+      console.error('Error generating content:', error);
+      setError('Failed to generate content. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -153,6 +176,17 @@ const PostForm: React.FC<PostFormProps> = ({ isEditing = false, postId, onFormCo
         </div>
         
         <div className="form-group">
+          <label htmlFor="topic">Topic (Optional - helps AI generate better content)</label>
+          <input
+            type="text"
+            id="topic"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder="Enter main topic for AI content"
+          />
+        </div>
+        
+        <div className="form-group">
           <label htmlFor="content">Content</label>
           <textarea
             id="content"
@@ -162,6 +196,14 @@ const PostForm: React.FC<PostFormProps> = ({ isEditing = false, postId, onFormCo
             rows={6}
             required
           />
+          <button 
+            type="button" 
+            className="generate-button"
+            onClick={generateContent}
+            disabled={isGenerating || !title.trim()}
+          >
+            {isGenerating ? 'Generating...' : 'Generate Content with AI'}
+          </button>
         </div>
         
         <div className="form-group">

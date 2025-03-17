@@ -21,6 +21,7 @@ const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const passport_1 = __importDefault(require("passport"));
 const path_1 = __importDefault(require("path"));
+const aiRoutes_1 = __importDefault(require("./routes/aiRoutes"));
 // Import routes
 const postsRoutes_1 = __importDefault(require("./routes/postsRoutes"));
 const commentsRoutes_1 = __importDefault(require("./routes/commentsRoutes"));
@@ -54,7 +55,8 @@ const initApp = () => {
                 origin: [
                     process.env.FRONTEND_URL || 'http://localhost:5173',
                     'http://localhost:5173',
-                    'http://127.0.0.1:5173'
+                    'http://127.0.0.1:5173',
+                    'https://node01.cs.colman.ac.il'
                 ],
                 credentials: true, // Important for cookies to work cross-origin
                 methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -69,6 +71,7 @@ const initApp = () => {
             app.use('/api/comments', commentsRoutes_1.default);
             app.use('/auth', authRoutes_1.default);
             app.use('/file', fileRoutes_1.default);
+            app.use('/api/ai', aiRoutes_1.default);
             resolve(app);
         }
         catch (error) {
