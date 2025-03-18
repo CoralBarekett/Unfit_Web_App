@@ -158,6 +158,57 @@ const authController_1 = require("../controllers/authController");
  *       404:
  *         description: Post not found
  */
+/**
+ * @swagger
+ * /posts/my-posts:
+ *   get:
+ *     summary: Get posts of the authenticated user
+ *     tags:
+ *       - Posts
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of the user's posts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   title:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *                   owner:
+ *                     type: string
+ */
+router.get('/my-posts', authController_1.authMiddleware, postController_1.default.getMyPosts.bind(postController_1.default));
+/**
+ * @swagger
+ * /posts/{id}/like:
+ *   post:
+ *     summary: Toggle like on a post
+ *     tags:
+ *       - Posts
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the post to like/unlike
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Like toggled successfully
+ *       404:
+ *         description: Post not found
+ */
 router.get('/my-posts', authController_1.authMiddleware, postController_1.default.getMyPosts.bind(postController_1.default));
 router.get('/:id', postController_1.default.getById.bind(postController_1.default));
 router.get('/', postController_1.default.getAll.bind(postController_1.default));

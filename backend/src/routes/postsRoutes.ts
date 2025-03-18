@@ -159,6 +159,59 @@ import { authMiddleware } from '../controllers/authController';
  *         description: Post not found
  */
 
+/**
+ * @swagger
+ * /posts/my-posts:
+ *   get:
+ *     summary: Get posts of the authenticated user
+ *     tags:
+ *       - Posts
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of the user's posts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   title:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *                   owner:
+ *                     type: string
+ */
+router.get('/my-posts', authMiddleware, postController.getMyPosts.bind(postController));
+
+/**
+ * @swagger
+ * /posts/{id}/like:
+ *   post:
+ *     summary: Toggle like on a post
+ *     tags:
+ *       - Posts
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the post to like/unlike
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Like toggled successfully
+ *       404:
+ *         description: Post not found
+ */
+
 router.get('/my-posts', authMiddleware, postController.getMyPosts.bind(postController));
 router.get('/:id', postController.getById.bind(postController));
 router.get('/', postController.getAll.bind(postController));
