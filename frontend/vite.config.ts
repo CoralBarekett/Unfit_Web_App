@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   base: "/",
@@ -11,32 +10,32 @@ export default defineConfig({
       "/auth": {
         target:
           process.env.NODE_ENV === "production"
-            ? "http://127.0.0.1:3001"
-            : "http://localhost:3001",
+            ? "http://node01.cs.colman.ac.il:3001"  // Use your production server's address
+            : "http://localhost:3001",  // Use localhost for development
         changeOrigin: true,
         secure: false,
       },
       "/api": {
         target:
           process.env.NODE_ENV === "production"
-            ? "http://127.0.0.1:3001"
-            : "http://localhost:3001",
+            ? "http://node01.cs.colman.ac.il:3001"  // Production server URL
+            : "http://localhost:3001",  // Local development
         changeOrigin: true,
         secure: false,
       },
       "/posts": {
         target:
           process.env.NODE_ENV === "production"
-            ? "http://127.0.0.1:3001"
-            : "http://localhost:3001",
+            ? "http://node01.cs.colman.ac.il:3001"  // Adjust for production
+            : "http://localhost:3001",  // Local for development
         changeOrigin: true,
         secure: false,
       },
       "/comments": {
         target:
           process.env.NODE_ENV === "production"
-            ? "http://127.0.0.1:3001"
-            : "http://localhost:3001",
+            ? "http://node01.cs.colman.ac.il:3001"  // Use your actual server in production
+            : "http://localhost:3001",  // Local development
         changeOrigin: true,
         secure: false,
       },

@@ -28,6 +28,9 @@ const port = parseInt(process.env.PORT || "3001", 10);
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const app = yield (0, server_1.default)();
+        app.get("/", (req, res) => {
+            res.send("Hello");
+        });
         console.log("Uploads directory:", path_1.default.join(__dirname, "uploads"));
         // Serve static files from 'uploads' directory
         app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "..", "uploads")));

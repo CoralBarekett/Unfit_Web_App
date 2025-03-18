@@ -17,6 +17,10 @@ const startServer = async () => {
   try {
     const app = await appInit();
 
+    app.get("/", (req, res) => {
+      res.send("Hello");  
+    });    
+
     console.log("Uploads directory:", path.join(__dirname, "uploads"));
 
     // Serve static files from 'uploads' directory
