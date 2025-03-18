@@ -45,7 +45,7 @@ const OAuthCallback: React.FC = () => {
           setStatus('Fetching user data...');
           
           // Get user info - use the correct API URL
-          const API_URL = 'http://localhost:3001'; // Make sure this matches your backend
+          const API_URL = import.meta.env.VITE_API_URL || '';
           const response = await axios.get(`${API_URL}/auth/user`);
           
           if (response.data) {

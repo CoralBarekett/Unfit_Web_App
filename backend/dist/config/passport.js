@@ -18,62 +18,66 @@ const passport_google_oauth20_1 = require("passport-google-oauth20");
 const passport_facebook_1 = require("passport-facebook");
 const userModel_1 = __importDefault(require("../models/userModel"));
 // Configure Google OAuth Strategy
-passport_1.default.use(new passport_google_oauth20_1.Strategy({
-    clientID: process.env.GOOGLE_CLIENT_ID || '',
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    callbackURL: `${process.env.API_URL || 'http://localhost:3001'}/auth/google/callback`,
-    // Use Google's People API for userinfo (more reliable)
-    userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
-}, (accessToken, refreshToken, profile, done) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        console.log('Google profile:', JSON.stringify(profile));
-        // Check if user already exists with this Google ID
-        let user = yield userModel_1.default.findOne({ googleId: profile.id });
-        if (user) {
-            return done(null, user);
-        }
-        // Check if user with same email already exists
-        if (profile.emails && profile.emails.length > 0) {
-            const email = profile.emails[0].value;
-            user = yield userModel_1.default.findOne({ email });
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    passport_1.default.use(new passport_google_oauth20_1.Strategy({
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: `${process.env.API_URL || "http://localhost:3001"}/auth/google/callback`,
+        userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+    }, (accessToken, refreshToken, profile, done) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            console.log("Google profile:", JSON.stringify(profile));
+            // Check if user already exists with this Google ID
+            let user = yield userModel_1.default.findOne({ googleId: profile.id });
             if (user) {
-                // Link Google account to existing user
-                user.googleId = profile.id;
-                yield user.save();
                 return done(null, user);
             }
+            // Check if user with same email already exists
+            if (profile.emails && profile.emails.length > 0) {
+                const email = profile.emails[0].value;
+                user = yield userModel_1.default.findOne({ email });
+                if (user) {
+                    // Link Google account to existing user
+                    user.googleId = profile.id;
+                    yield user.save();
+                    return done(null, user);
+                }
+            }
+            // Create new user
+            const email = profile.emails && profile.emails.length > 0
+                ? profile.emails[0].value
+                : `${profile.id}@google.user`;
+            const username = (profile.displayName || profile.id).replace(/\s/g, "") +
+                Math.floor(Math.random() * 10000).toString();
+            user = yield userModel_1.default.create({
+                email,
+                username,
+                googleId: profile.id,
+                refreshToken: [],
+            });
+            return done(null, user);
         }
-        // Create new user
-        const email = profile.emails && profile.emails.length > 0
-            ? profile.emails[0].value
-            : `${profile.id}@google.user`;
-        const username = (profile.displayName || profile.id)
-            .replace(/\s/g, '') + Math.floor(Math.random() * 10000).toString();
-        user = yield userModel_1.default.create({
-            email,
-            username,
-            googleId: profile.id,
-            refreshToken: []
-        });
-        return done(null, user);
-    }
-    catch (error) {
-        console.error('Google OAuth error:', error);
-        return done(error);
-    }
-})));
+        catch (error) {
+            console.error("Google OAuth error:", error);
+            return done(error);
+        }
+    })));
+}
+else {
+    console.warn("Google OAuth credentials not found in environment variables");
+}
 // Configure Facebook OAuth Strategy
 passport_1.default.use(new passport_facebook_1.Strategy({
-    clientID: process.env.FACEBOOK_APP_ID || '',
-    clientSecret: process.env.FACEBOOK_APP_SECRET || '',
-    callbackURL: `${process.env.API_URL || 'http://localhost:3001'}/auth/facebook/callback`,
-    profileFields: ['id', 'emails', 'name', 'displayName'],
+    clientID: process.env.FACEBOOK_APP_ID || "",
+    clientSecret: process.env.FACEBOOK_APP_SECRET || "",
+    callbackURL: `${process.env.API_URL || "http://localhost:3001"}/auth/facebook/callback`,
+    profileFields: ["id", "emails", "name", "displayName"],
     // Enable proof for improved security
-    enableProof: true
+    enableProof: true,
 }, (accessToken, refreshToken, profile, done) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Log profile for debugging
-        console.log('Facebook profile:', JSON.stringify(profile));
+        console.log("Facebook profile:", JSON.stringify(profile));
         // Check if user already exists with this Facebook ID
         let user = yield userModel_1.default.findOne({ facebookId: profile.id });
         if (user) {
@@ -91,24 +95,24 @@ passport_1.default.use(new passport_facebook_1.Strategy({
             }
         }
         else {
-            console.log('No email found in Facebook profile. This might be because your app does not have email permission.');
+            console.log("No email found in Facebook profile. This might be because your app does not have email permission.");
         }
         // Create new user
         const email = profile.emails && profile.emails.length > 0
             ? profile.emails[0].value
             : `${profile.id}@facebook.user`;
-        const username = (profile.displayName || profile.id)
-            .replace(/\s/g, '') + Math.floor(Math.random() * 10000).toString();
+        const username = (profile.displayName || profile.id).replace(/\s/g, "") +
+            Math.floor(Math.random() * 10000).toString();
         user = yield userModel_1.default.create({
             email,
             username,
             facebookId: profile.id,
-            refreshToken: []
+            refreshToken: [],
         });
         return done(null, user);
     }
     catch (error) {
-        console.error('Facebook OAuth error:', error);
+        console.error("Facebook OAuth error:", error);
         return done(error);
     }
 })));

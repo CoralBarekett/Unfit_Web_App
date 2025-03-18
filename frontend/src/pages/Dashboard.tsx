@@ -24,7 +24,7 @@ const Dashboard = () => {
     const refreshUserData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:3001'}/auth/user`,
+         `/file?file=${__filename}`,
           { withCredentials: true }
         );
         

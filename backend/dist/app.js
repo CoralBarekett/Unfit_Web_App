@@ -24,13 +24,13 @@ const path_1 = __importDefault(require("path"));
 const aiRoutes_1 = __importDefault(require("./routes/aiRoutes"));
 //import { RequestHandler } from "express";
 dotenv_1.default.config();
-const port = process.env.PORT || 3001;
+const port = parseInt(process.env.PORT || "3001", 10);
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const app = yield (0, server_1.default)();
         console.log("Uploads directory:", path_1.default.join(__dirname, "uploads"));
         // Serve static files from 'uploads' directory
-        app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, '..', "uploads")));
+        app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "..", "uploads")));
         // Use file routes
         app.use("/file", fileRoutes_1.default);
         // Generate Swagger documentation
@@ -52,10 +52,11 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
             }
         });
         // Start the server
-        app.listen(port, () => {
-            console.log(`Server started at http://localhost:${port}`);
-            console.log(`API Documentation available at http://localhost:${port}/api-docs`);
-            console.log(`OAuth endpoints available at http://localhost:${port}/auth/google and http://localhost:${port}/auth/facebook`);
+        app.listen(port, "0.0.0.0", () => {
+            console.log(`Server started at http://${process.env.FRONTEND_URL || "0.0.0.0"}:${port}`);
+            console.log(`API Documentation available at http://${process.env.FRONTEND_URL || "0.0.0.0"}:${port}/api-docs`);
+            // Use environment variables here too
+            console.log(`OAuth endpoints available at http://${process.env.FRONTEND_URL || "0.0.0.0"}:${port}/auth/google and http://${process.env.FRONTEND_URL || "0.0.0.0"}:${port}/auth/facebook`);
         });
     }
     catch (error) {
