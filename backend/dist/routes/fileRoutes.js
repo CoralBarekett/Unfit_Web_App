@@ -10,6 +10,48 @@ const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const router = express_1.default.Router();
+/**
+ * @swagger
+ * /upload:
+ *   post:
+ *     summary: Upload an image file
+ *     tags:
+ *       - Upload
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: File uploaded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 url:
+ *                   type: string
+ *                 filename:
+ *                   type: string
+ *                 originalname:
+ *                   type: string
+ *                 mimetype:
+ *                   type: string
+ *                 size:
+ *                   type: number
+ *       400:
+ *         description: No file uploaded
+ *       500:
+ *         description: File upload failed
+ */
 // Ensure uploads directory exists
 const uploadDir = path_1.default.join(__dirname, '..', '..', 'uploads');
 console.log('Upload directory path:', uploadDir);

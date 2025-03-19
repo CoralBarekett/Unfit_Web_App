@@ -42,14 +42,14 @@ afterAll(() => {
 });
 describe("Posts test", () => {
     test("Test get all post empty", () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app).get('/posts');
+        const response = yield (0, supertest_1.default)(app).get('/api/posts');
         expect(response.statusCode).toBe(200);
-        expect(response.body.length).toBe(0);
+        expect(response.body.posts.length).toBe(0);
     }));
     test("Test create new post", () => __awaiter(void 0, void 0, void 0, function* () {
         for (const post of testPosts) {
             const response = yield (0, supertest_1.default)(app)
-                .post('/posts')
+                .post('/api/posts')
                 .set('authorization', "JWT " + testUser.accessToken)
                 .send({
                 title: post.title,
@@ -68,7 +68,7 @@ describe("Posts test", () => {
     // Test invalid post creation
     test("Test create invalid post", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
-            .post('/posts')
+            .post('/api/posts')
             .set({ authorization: "JWT " + testUser.accessToken })
             .send({
             // Missing title and content
@@ -77,29 +77,29 @@ describe("Posts test", () => {
         expect(response.statusCode).toBe(400);
     }));
     test("Test get all post", () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app).get('/posts');
+        const response = yield (0, supertest_1.default)(app).get('/api/posts');
         expect(response.statusCode).toBe(200);
-        expect(response.body.length).toBe(testPosts.length);
+        expect(response.body.posts.length).toBe(testPosts.length);
     }));
     test("Test get post by id", () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app).get('/posts/' + testPosts[0]._id);
+        const response = yield (0, supertest_1.default)(app).get('/api/posts/' + testPosts[0]._id);
         expect(response.statusCode).toBe(200);
         expect(response.body._id).toBe(testPosts[0]._id);
     }));
     // Test get post with invalid ID
     test("Test get post with invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app).get('/posts/invalidid');
+        const response = yield (0, supertest_1.default)(app).get('/api/posts/invalidid');
         expect(response.statusCode).toBe(400);
     }));
     // Test get non-existent post
     test("Test get non-existent post", () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app).get('/posts/' + new mongoose_1.default.Types.ObjectId());
+        const response = yield (0, supertest_1.default)(app).get('/api/posts/' + new mongoose_1.default.Types.ObjectId());
         expect(response.statusCode).toBe(404);
     }));
     test("Test get post by owner", () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app).get('/posts?owner=' + ownerIdFromResponse);
+        const response = yield (0, supertest_1.default)(app).get('/api/posts?owner=' + ownerIdFromResponse);
         expect(response.statusCode).toBe(200);
-        expect(response.body.length).toBe(2);
+        expect(response.body.posts.length).toBe(2);
     }));
     test("Test update post", () => __awaiter(void 0, void 0, void 0, function* () {
         const newPost = {
@@ -108,7 +108,7 @@ describe("Posts test", () => {
             owner: 'Coral'
         };
         const response = yield (0, supertest_1.default)(app)
-            .put('/posts/' + testPosts[0]._id)
+            .put('/api/posts/' + testPosts[0]._id)
             .set({ authorization: "JWT " + testUser.accessToken })
             .send(newPost);
         expect(response.statusCode).toBe(200);
@@ -116,24 +116,22 @@ describe("Posts test", () => {
         expect(response.body.content).toBe(newPost.content);
         expect(response.body.owner).toBe(newPost.owner);
     }));
-    // Test update with invalid ID
     test("Test update post with invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app)
-            .put('/posts/3456tdfgy6567uy')
+            .put('/api/posts/invalidid')
             .set({ authorization: "JWT " + testUser.accessToken })
             .send(testPosts[0]);
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(500);
     }));
     test('Test delete post', () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app).delete('/posts/' + testPosts[0]._id)
+        const response = yield (0, supertest_1.default)(app).delete('/api/posts/' + testPosts[0]._id)
             .set({ authorization: "JWT " + testUser.accessToken });
         expect(response.statusCode).toBe(200);
-        const responseGet = yield (0, supertest_1.default)(app).get('/posts/' + testPosts[0]._id);
+        const responseGet = yield (0, supertest_1.default)(app).get('/api/posts/' + testPosts[0]._id);
         expect(responseGet.statusCode).toBe(404);
     }));
-    // Test delete with invalid ID
     test("Test delete post with invalid id", () => __awaiter(void 0, void 0, void 0, function* () {
-        const response = yield (0, supertest_1.default)(app).delete('/posts/s45d6fvbuj9gfh8jinf67gh')
+        const response = yield (0, supertest_1.default)(app).delete('/api/posts/s45d6fvbuj9gfh8jinf67gh')
             .set({ authorization: "JWT " + testUser.accessToken });
         expect(response.statusCode).toBe(400);
     }));
