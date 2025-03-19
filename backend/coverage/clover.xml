@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1742372750065" clover="3.2.0">
-  <project timestamp="1742372750065" name="All files">
-    <metrics statements="577" coveredstatements="254" conditionals="198" coveredconditionals="35" methods="60" coveredmethods="22" elements="835" coveredelements="311" complexity="0" loc="577" ncloc="577" packages="6" files="16" classes="16"/>
+<coverage generated="1742376471231" clover="3.2.0">
+  <project timestamp="1742376471231" name="All files">
+    <metrics statements="577" coveredstatements="242" conditionals="198" coveredconditionals="29" methods="60" coveredmethods="21" elements="835" coveredelements="292" complexity="0" loc="577" ncloc="577" packages="6" files="16" classes="16"/>
     <package name="src">
       <metrics statements="42" coveredstatements="37" conditionals="3" coveredconditionals="1" methods="5" coveredmethods="3"/>
       <file name="server.ts" path="/Users/yambalas/Desktop/studies/third year/advanced web application/Unfit_Web_App/backend/src/server.ts">
@@ -110,7 +110,7 @@
       </file>
     </package>
     <package name="src.controllers">
-      <metrics statements="326" coveredstatements="115" conditionals="121" coveredconditionals="18" methods="38" coveredmethods="16"/>
+      <metrics statements="326" coveredstatements="103" conditionals="121" coveredconditionals="12" methods="38" coveredmethods="15"/>
       <file name="aiController.ts" path="/Users/yambalas/Desktop/studies/third year/advanced web application/Unfit_Web_App/backend/src/controllers/aiController.ts">
         <metrics statements="17" coveredstatements="2" conditionals="6" coveredconditionals="0" methods="2" coveredmethods="0"/>
         <line num="3" count="1" type="stmt"/>
@@ -286,15 +286,15 @@
         <line num="407" count="0" type="stmt"/>
         <line num="408" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="412" count="1" type="stmt"/>
-        <line num="413" count="7" type="stmt"/>
-        <line num="415" count="7" type="stmt"/>
-        <line num="416" count="7" type="stmt"/>
-        <line num="418" count="7" type="cond" truecount="1" falsecount="0"/>
-        <line num="420" count="7" type="cond" truecount="1" falsecount="1"/>
+        <line num="413" count="5" type="stmt"/>
+        <line num="415" count="5" type="stmt"/>
+        <line num="416" count="5" type="stmt"/>
+        <line num="418" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="420" count="5" type="cond" truecount="1" falsecount="1"/>
         <line num="421" count="0" type="stmt"/>
-        <line num="422" count="7" type="cond" truecount="1" falsecount="0"/>
-        <line num="423" count="7" type="stmt"/>
-        <line num="428" count="7" type="cond" truecount="1" falsecount="2"/>
+        <line num="422" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="423" count="5" type="stmt"/>
+        <line num="428" count="5" type="cond" truecount="1" falsecount="2"/>
         <line num="430" count="0" type="cond" truecount="0" falsecount="1"/>
         <line num="431" count="0" type="stmt"/>
         <line num="432" count="0" type="stmt"/>
@@ -303,86 +303,86 @@
         <line num="437" count="0" type="stmt"/>
         <line num="438" count="0" type="stmt"/>
         <line num="439" count="0" type="stmt"/>
-        <line num="445" count="7" type="cond" truecount="0" falsecount="1"/>
+        <line num="445" count="5" type="cond" truecount="0" falsecount="1"/>
         <line num="446" count="0" type="stmt"/>
         <line num="447" count="0" type="stmt"/>
-        <line num="450" count="7" type="cond" truecount="0" falsecount="1"/>
+        <line num="450" count="5" type="cond" truecount="0" falsecount="1"/>
         <line num="451" count="0" type="stmt"/>
         <line num="452" count="0" type="stmt"/>
-        <line num="455" count="7" type="stmt"/>
-        <line num="456" count="7" type="cond" truecount="0" falsecount="1"/>
+        <line num="455" count="5" type="stmt"/>
+        <line num="456" count="5" type="cond" truecount="0" falsecount="1"/>
         <line num="457" count="0" type="stmt"/>
         <line num="458" count="0" type="stmt"/>
-        <line num="460" count="7" type="stmt"/>
-        <line num="461" count="7" type="stmt"/>
+        <line num="460" count="5" type="stmt"/>
+        <line num="461" count="5" type="stmt"/>
         <line num="464" count="0" type="stmt"/>
         <line num="465" count="0" type="stmt"/>
         <line num="469" count="1" type="stmt"/>
         <line num="480" count="1" type="stmt"/>
       </file>
       <file name="baseController.ts" path="/Users/yambalas/Desktop/studies/third year/advanced web application/Unfit_Web_App/backend/src/controllers/baseController.ts">
-        <metrics statements="36" coveredstatements="26" conditionals="6" coveredconditionals="3" methods="6" coveredmethods="5"/>
+        <metrics statements="36" coveredstatements="19" conditionals="6" coveredconditionals="2" methods="6" coveredmethods="4"/>
         <line num="7" count="2" type="stmt"/>
-        <line num="11" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="13" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="11" count="3" type="stmt"/>
+        <line num="12" count="3" type="stmt"/>
+        <line num="13" count="3" type="cond" truecount="1" falsecount="1"/>
         <line num="14" count="0" type="stmt"/>
         <line num="15" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
+        <line num="17" count="3" type="stmt"/>
+        <line num="18" count="3" type="stmt"/>
         <line num="21" count="0" type="stmt"/>
-        <line num="26" count="4" type="stmt"/>
-        <line num="28" count="4" type="stmt"/>
-        <line num="29" count="4" type="stmt"/>
-        <line num="30" count="3" type="cond" truecount="2" falsecount="0"/>
-        <line num="31" count="1" type="stmt"/>
-        <line num="33" count="2" type="stmt"/>
+        <line num="26" count="2" type="stmt"/>
+        <line num="28" count="2" type="stmt"/>
+        <line num="29" count="2" type="stmt"/>
+        <line num="30" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="33" count="1" type="stmt"/>
         <line num="36" count="1" type="stmt"/>
-        <line num="41" count="3" type="stmt"/>
-        <line num="42" count="3" type="stmt"/>
-        <line num="43" count="3" type="stmt"/>
-        <line num="44" count="2" type="stmt"/>
-        <line num="46" count="1" type="stmt"/>
+        <line num="41" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="46" count="0" type="stmt"/>
         <line num="51" count="1" type="stmt"/>
         <line num="52" count="1" type="stmt"/>
         <line num="53" count="1" type="stmt"/>
         <line num="54" count="1" type="stmt"/>
         <line num="55" count="1" type="stmt"/>
-        <line num="56" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="56" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="57" count="0" type="stmt"/>
-        <line num="59" count="1" type="stmt"/>
-        <line num="62" count="0" type="stmt"/>
-        <line num="67" count="2" type="stmt"/>
-        <line num="68" count="2" type="stmt"/>
-        <line num="69" count="2" type="stmt"/>
-        <line num="70" count="1" type="stmt"/>
-        <line num="72" count="1" type="stmt"/>
+        <line num="59" count="0" type="stmt"/>
+        <line num="62" count="1" type="stmt"/>
+        <line num="67" count="0" type="stmt"/>
+        <line num="68" count="0" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="70" count="0" type="stmt"/>
+        <line num="72" count="0" type="stmt"/>
         <line num="77" count="1" type="stmt"/>
       </file>
       <file name="commentController.ts" path="/Users/yambalas/Desktop/studies/third year/advanced web application/Unfit_Web_App/backend/src/controllers/commentController.ts">
-        <metrics statements="33" coveredstatements="5" conditionals="2" coveredconditionals="0" methods="4" coveredmethods="1"/>
+        <metrics statements="33" coveredstatements="23" conditionals="2" coveredconditionals="0" methods="4" coveredmethods="4"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
         <line num="5" count="1" type="stmt"/>
         <line num="9" count="1" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="15" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="27" count="0" type="stmt"/>
-        <line num="32" count="0" type="stmt"/>
-        <line num="34" count="0" type="stmt"/>
-        <line num="39" count="0" type="stmt"/>
-        <line num="40" count="0" type="stmt"/>
-        <line num="41" count="0" type="stmt"/>
-        <line num="44" count="0" type="stmt"/>
+        <line num="13" count="3" type="stmt"/>
+        <line num="14" count="3" type="stmt"/>
+        <line num="15" count="3" type="stmt"/>
+        <line num="17" count="3" type="stmt"/>
+        <line num="23" count="3" type="stmt"/>
+        <line num="24" count="3" type="stmt"/>
+        <line num="27" count="2" type="stmt"/>
+        <line num="32" count="2" type="stmt"/>
+        <line num="34" count="1" type="stmt"/>
+        <line num="39" count="1" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
+        <line num="41" count="1" type="stmt"/>
+        <line num="44" count="1" type="stmt"/>
         <line num="46" count="0" type="stmt"/>
-        <line num="51" count="0" type="stmt"/>
-        <line num="52" count="0" type="stmt"/>
-        <line num="53" count="0" type="stmt"/>
-        <line num="55" count="0" type="stmt"/>
+        <line num="51" count="1" type="stmt"/>
+        <line num="52" count="1" type="stmt"/>
+        <line num="53" count="1" type="stmt"/>
+        <line num="55" count="1" type="stmt"/>
         <line num="57" count="0" type="cond" truecount="0" falsecount="1"/>
         <line num="58" count="0" type="stmt"/>
         <line num="59" count="0" type="stmt"/>
@@ -392,49 +392,49 @@
         <line num="69" count="0" type="stmt"/>
         <line num="74" count="0" type="stmt"/>
         <line num="75" count="0" type="stmt"/>
-        <line num="77" count="0" type="stmt"/>
+        <line num="77" count="1" type="stmt"/>
         <line num="82" count="1" type="stmt"/>
       </file>
       <file name="postController.ts" path="/Users/yambalas/Desktop/studies/third year/advanced web application/Unfit_Web_App/backend/src/controllers/postController.ts">
-        <metrics statements="54" coveredstatements="27" conditionals="12" coveredconditionals="5" methods="6" coveredmethods="4"/>
+        <metrics statements="54" coveredstatements="4" conditionals="12" coveredconditionals="0" methods="6" coveredmethods="1"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
         <line num="8" count="1" type="stmt"/>
-        <line num="12" count="3" type="stmt"/>
-        <line num="15" count="3" type="cond" truecount="1" falsecount="1"/>
-        <line num="17" count="3" type="stmt"/>
-        <line num="25" count="3" type="stmt"/>
-        <line num="26" count="3" type="stmt"/>
-        <line num="27" count="3" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="15" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="17" count="0" type="stmt"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="26" count="0" type="stmt"/>
+        <line num="27" count="0" type="stmt"/>
         <line num="29" count="0" type="stmt"/>
-        <line num="34" count="2" type="stmt"/>
-        <line num="35" count="2" type="stmt"/>
-        <line num="36" count="2" type="stmt"/>
-        <line num="39" count="2" type="stmt"/>
-        <line num="40" count="1" type="cond" truecount="0" falsecount="1"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="39" count="0" type="stmt"/>
+        <line num="40" count="0" type="cond" truecount="0" falsecount="1"/>
         <line num="41" count="0" type="stmt"/>
         <line num="42" count="0" type="stmt"/>
-        <line num="46" count="1" type="cond" truecount="0" falsecount="1"/>
+        <line num="46" count="0" type="cond" truecount="0" falsecount="1"/>
         <line num="47" count="0" type="stmt"/>
         <line num="48" count="0" type="stmt"/>
-        <line num="52" count="1" type="cond" truecount="0" falsecount="1"/>
+        <line num="52" count="0" type="cond" truecount="0" falsecount="1"/>
         <line num="53" count="0" type="stmt"/>
         <line num="54" count="0" type="stmt"/>
-        <line num="57" count="1" type="stmt"/>
-        <line num="59" count="1" type="stmt"/>
+        <line num="57" count="0" type="stmt"/>
+        <line num="59" count="0" type="stmt"/>
         <line num="65" count="0" type="stmt"/>
         <line num="66" count="0" type="stmt"/>
         <line num="67" count="0" type="stmt"/>
         <line num="68" count="0" type="stmt"/>
         <line num="70" count="0" type="stmt"/>
-        <line num="76" count="3" type="stmt"/>
-        <line num="77" count="3" type="cond" truecount="2" falsecount="0"/>
-        <line num="78" count="3" type="cond" truecount="2" falsecount="0"/>
-        <line num="79" count="3" type="stmt"/>
-        <line num="81" count="3" type="stmt"/>
-        <line num="86" count="3" type="stmt"/>
-        <line num="87" count="3" type="stmt"/>
-        <line num="89" count="3" type="stmt"/>
+        <line num="76" count="0" type="stmt"/>
+        <line num="77" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="78" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="79" count="0" type="stmt"/>
+        <line num="81" count="0" type="stmt"/>
+        <line num="86" count="0" type="stmt"/>
+        <line num="87" count="0" type="stmt"/>
+        <line num="89" count="0" type="stmt"/>
         <line num="96" count="0" type="stmt"/>
         <line num="102" count="0" type="stmt"/>
         <line num="103" count="0" type="stmt"/>
