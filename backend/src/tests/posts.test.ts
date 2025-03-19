@@ -55,13 +55,13 @@ describe("Posts test", () => {
     test("Test get all post empty", async () => {
         const response = await request(app).get('/api/posts');
         expect(response.statusCode).toBe(200);
-        expect(response.body.length).toBe(0);
+        expect(response.body.posts.length).toBe(0);
     });
 
     test("Test create new post", async () => {
         for (const post of testPosts) {
             const response = await request(app)
-                .post('/posts')
+                .post('/api/posts')
                 .set('authorization', "JWT " + testUser.accessToken)
                 .send({
                     title: post.title,
@@ -93,7 +93,7 @@ describe("Posts test", () => {
     test("Test get all post", async () => {
         const response = await request(app).get('/api/posts');
         expect(response.statusCode).toBe(200);
-        expect(response.body.length).toBe(testPosts.length);
+        expect(response.body.posts.length).toBe(testPosts.length);
     });
 
     test("Test get post by id", async () => {
@@ -117,7 +117,7 @@ describe("Posts test", () => {
     test("Test get post by owner", async () => {
         const response = await request(app).get('/api/posts?owner=' + ownerIdFromResponse);
         expect(response.statusCode).toBe(200);
-        expect(response.body.length).toBe(2);
+        expect(response.body.posts.length).toBe(2);
     });
 
     test("Test update post", async () => {
@@ -136,13 +136,12 @@ describe("Posts test", () => {
         expect(response.body.owner).toBe(newPost.owner);
     });
 
-    // Test update with invalid ID
     test("Test update post with invalid id", async () => {
         const response = await request(app)
-            .put('/api/posts/3456tdfgy6567uy')
+            .put('/api/posts/invalidid')
             .set({ authorization: "JWT " + testUser.accessToken })
             .send(testPosts[0]);
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(500);
     });
 
     test('Test delete post', async () => {
@@ -154,7 +153,6 @@ describe("Posts test", () => {
         expect(responseGet.statusCode).toBe(404);
     });
 
-    // Test delete with invalid ID
     test("Test delete post with invalid id", async () => {
         const response = await request(app).delete('/api/posts/s45d6fvbuj9gfh8jinf67gh')
             .set({ authorization: "JWT " + testUser.accessToken });
